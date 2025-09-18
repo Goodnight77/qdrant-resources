@@ -83,7 +83,7 @@ Brief description of what this tutorial covers
 
 ### Example Tutorial Folder with Guides
 
-```
+```markdown
 image-recommendation/
 ├── image_rec_qdrant.ipynb    # Main tutorial notebook
 ├── launch.py          # Launch script
@@ -106,7 +106,7 @@ Projects are complete, self-contained implementations with all necessary scripts
    - Sample data or instructions to obtain data (if applicable)
 
 3. **Folder Structure Example**:
-   ```
+   ```markdown
    my_project/
    ├── README.md
    ├── requirements.txt

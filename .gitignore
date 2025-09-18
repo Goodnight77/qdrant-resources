@@ -1,0 +1,10 @@
+.venv
+.env
+*qdrant_db/
+*db/
+notes.md
+test/
+img_recom/
+
+
+
