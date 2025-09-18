@@ -73,9 +73,7 @@ Brief description of what this tutorial covers
 - Basic knowledge of vector databases
 
 ## Installation
-```python
 !pip install qdrant-client
-```
 
 ## Step 1: Setup
 ...
