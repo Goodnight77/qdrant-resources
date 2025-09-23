@@ -25,7 +25,7 @@ Chonkie offers multiple chunking strategies for text processing:
 ## Quick Start
 
 ```bash
-pip install chonkie qdrant-client
+pip install chonkie[qdrant]
 ```
 
 ## Contents
