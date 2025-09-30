@@ -35,7 +35,7 @@ pip install chonkie[qdrant]
   - Qdrant vector store integration
   - Real-world text processing examples
   
-- **`tinystories.txt`** - Sample dataset with 27k+ Tiny Stories for testing chunking strategies ( also you can download it withing the notebook )
+- **`tinystories.txt`** - Sample dataset containing 27k+ Tiny Stories for testing chunking strategies (also available for download within the notebook)
 
 ## Tutorial Highlights
 
@@ -51,6 +51,7 @@ Perfect for building RAG systems, semantic search, and document processing appli
 * [Chonkie Qdrant Handshake](https://docs.chonkie.ai/python-sdk/handshakes/qdrant-handshake)
 * [Chonkie Documentation](https://docs.chonkie.ai/python-sdk/getting-started/introduction)
 * [Qdrant Documentation](https://qdrant.tech/documentation/)
+* [Other Chonkie Handshakes](https://docs.chonkie.ai/python-sdk/handshakes/overview)
 
 ---
 
