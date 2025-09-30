@@ -1,7 +1,7 @@
 # Chonkie and Qdrant Integration
 
 <!-- ![Chonkie Logo](assets/chonkie.png) -->
-![handshake](assets/handshake.png)
+![handshake](../assets/handshake.png)
 
 ## What is Chonkie?
 **Chonkie** is a Python SDK that provides a pipeline for chunking text, embedding those chunks, and seamlessly integrating with vector stores like Qdrant.
