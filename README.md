@@ -26,7 +26,9 @@
 </div>
 
 </div>
-<br>
+
+**Unofficial | Community-maintained resources (not affiliated with Qdrant).**
+
 
 ## Getting Started
 
