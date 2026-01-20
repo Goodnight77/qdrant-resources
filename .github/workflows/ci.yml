@@ -1,0 +1,64 @@
+name: Baseline CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint, Format, Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ruff black mypy
+
+      - name: Detect changed Python files
+        id: changed_py
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.py
+
+      - name: Show changed Python files
+        if: steps.changed_py.outputs.any_changed == 'true'
+        run: |
+          echo "Changed Python files:"
+          echo "${{ steps.changed_py.outputs.all_changed_files }}"
+
+      - name: Ruff lint
+        if: steps.changed_py.outputs.any_changed == 'true'
+        run: ruff check ${{ steps.changed_py.outputs.all_changed_files }}
+
+      - name: Black format check
+        if: steps.changed_py.outputs.any_changed == 'true'
+        run: black --check ${{ steps.changed_py.outputs.all_changed_files }}
+
+      - name: Mypy type check (optional)
+        if: steps.changed_py.outputs.any_changed == 'true'
+        continue-on-error: true
+        run: mypy --ignore-missing-imports ${{ steps.changed_py.outputs.all_changed_files }}
+
+      - name: No Python changes
+        if: steps.changed_py.outputs.any_changed != 'true'
+        run: echo "No Python files changed."
