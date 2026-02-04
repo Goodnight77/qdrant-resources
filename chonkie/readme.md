@@ -34,6 +34,8 @@ pip install chonkie[qdrant]
   - Chunking strategy performance comparison
   - Qdrant vector store integration
   - Real-world text processing examples
+
+- **Similar tutorial from the Chonkie cookbook** - [Chonkie_Qdrant_Handshake_for_TinyStories.ipynb](https://github.com/chonkie-inc/cookbook/blob/main/tutorials/Chonkie_Qdrant_Handshake_for_TinyStories.ipynb) that I made
   
 - **`tinystories.txt`** - Sample dataset containing 27k+ Tiny Stories for testing chunking strategies (also available for download within the notebook)
 
