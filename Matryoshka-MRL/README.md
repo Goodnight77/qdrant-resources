@@ -3,7 +3,9 @@
 **[Read the full article here](https://mohamedarbi.xyz/posts/matryoshka)**
 
 ## 🪆 Matryoshka Representation Learning (MRL)
-![alt text](../assets/mrl.png)
+<div align="center">
+  <img src="../assets/mrl.png" alt="alt text" width="400" />
+</div>
 Matryoshka Representation Learning (MRL) is a training strategy that encodes information at multiple granularities within a single high-dimensional vector. Inspired by Russian nesting dolls, MRL allows a single embedding vector to be sliced at various lengths (e.g., 64, 128, 256, 512, 1024 dimensions) while still maintaining semantic meaning and performance.
 
 ### The Core Concept
