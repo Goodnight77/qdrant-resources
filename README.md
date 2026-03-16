@@ -36,6 +36,8 @@ New to Qdrant? Here's how to get started:
 
 1. **First time with Qdrant?** Start with our [Qdrant 101 tutorial](Qdrant-101/qdrant_101_tutorial.ipynb)**✅ Ready!**
 2. **Text chunking with Qdrant?** Try the [Chonkie Integration](chonkie/Chonkie_Qdrant_Handshake.ipynb) - **✅ Ready!**
+4. **Multimodal Search?** Check out [Gemini Embeddings](Gemini-embeddings/) - **✅ Ready!**
+5. **Efficient Embeddings?** Learn about [Matryoshka MRL](Matryoshka-MRL/) - **✅ Ready!**
 
 <hr>
 
@@ -44,6 +46,8 @@ New to Qdrant? Here's how to get started:
 ### ✅ **Ready to Use**
 - **[Chonkie Integration](chonkie/)** - Complete text chunking tutorial with Qdrant handshake
 - **[Qdrant-101](Qdrant-101/)** - Foundational Qdrant concepts and getting started  
+- **[Gemini Embeddings](Gemini-embeddings/)** - Multimodal Semantic Search with Gemini 2
+- **[Matryoshka MRL](Matryoshka-MRL/)** - Matryoshka Representation Learning (MRL) concepts
 
 ### 🚧 **Coming Soon**
 - **[Quantization](quantization/)** - Vector quantization techniques (in development)
