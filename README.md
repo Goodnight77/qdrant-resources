@@ -18,6 +18,7 @@
 <div align="center">
   <h3>
     <a href="#getting-started">Getting Started</a> |
+    <a href="#official-qdrant-links">Official Qdrant Links</a> |
     <a href="#tutorials">Tutorials</a> |
     <a href="#projects">Projects</a> |
     <a href="#integrations">Integrations</a> |
@@ -38,6 +39,15 @@ New to Qdrant? Here's how to get started:
 2. **Text chunking with Qdrant?** Try the [Chonkie Integration](chonkie/Chonkie_Qdrant_Handshake.ipynb) - **✅ Ready!**
 4. **Multimodal Search?** Check out [Gemini Embeddings](Gemini-embeddings/) - **✅ Ready!**
 5. **Efficient Embeddings?** Learn about [Matryoshka MRL](Matryoshka-MRL/) - **✅ Ready!**
+
+<hr>
+
+## Official Qdrant Links
+
+- [Qdrant Homepage](http://qdrant.tech/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
+- [Qdrant Documentation](https://qdrant.tech/documentation/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
+- [Qdrant Cloud Sign Up](https://cloud.qdrant.io/signup?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
+- [Subscribe to the Qdrant Newsletter](https://qdrant.tech/subscribe/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 
 <hr>
 
