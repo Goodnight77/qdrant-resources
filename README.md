@@ -90,6 +90,16 @@ New to Qdrant? Here's how to get started:
 
 <hr>
 
+## Qdrant Skills
+
+Agent skills for Qdrant vector search: scaling, performance optimization, search quality, monitoring, deployment, model migration, version upgrades, and SDK usage across Python, TypeScript, Rust, Go, .NET, and Java.
+
+- Repository: [qdrant/skills](https://github.com/qdrant/skills)
+- Scope: practical workflows for building, operating, and upgrading Qdrant-backed applications
+- Use cases: retrieval quality tuning, operational monitoring, production deployment, and SDK-specific implementation guidance
+
+<hr>
+
 ## Contributing
 
 We welcome contributions to Qdrant Resources! 🎉 
