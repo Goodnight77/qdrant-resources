@@ -12,6 +12,14 @@ For Qdrant users, the main idea is to keep compact quantized vectors in RAM for 
 
 - [TurboQuant Qdrant notebook](TurboQuant-Qdrant.ipynb)
 
+## Results
+
+![TurboQuant Results](../assets/TQ-results.png)
+
+## Comparison
+
+![TurboQuant Comparison](../assets/TQ-comparison.png)
+
 ## References
 
 - [Full blog post](https://mohamedarbi.xyz/posts/turboquant-qdrant)
