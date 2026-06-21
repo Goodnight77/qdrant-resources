@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+data/
+wandb/
+results/
+.idea/
+
+# docs stay local — only README.md ships
+*.md
+!README.md
