@@ -3,11 +3,13 @@ rises, with p50 latency on the second axis.
 Usage: python -m qfo.viz.rescore_chart [collection]   default: pq
 Reads results/rescore_sweep_<coll>.json + results/results.json -> assets/rescore_<coll>.png
 """
+
 import json
 import os
 import sys
 
 import matplotlib
+
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
@@ -31,14 +33,33 @@ def main():
     lat = [r["latency_p50_ms"] for r in os_pts]
 
     fig, ax1 = plt.subplots(figsize=(9, 5.5))
-    ax1.set_title(f"{coll.upper()} {COMPRESS.get(coll, '')}: rescoring buys back recall for a few ms", weight="bold")
+    ax1.set_title(
+        f"{coll.upper()} {COMPRESS.get(coll, '')}: rescoring buys back recall for a few ms",
+        weight="bold",
+    )
 
-    ax1.axhline(base_recall, ls="--", color="#4C72B0", label=f"baseline f32 recall ({base_recall:.3f})")
-    ax1.plot(xs, rec, "-o", color="#55A868", lw=2, label=f"{coll.upper()} recall (rescored)")
-    ax1.scatter([1], [nr["recall_at_k"]], color="#C44E52", marker="X", s=110, zorder=5,
-                label=f"{coll.upper()} no rescore ({nr['recall_at_k']:.3f})")
+    ax1.axhline(
+        base_recall,
+        ls="--",
+        color="#4C72B0",
+        label=f"baseline f32 recall ({base_recall:.3f})",
+    )
+    ax1.plot(
+        xs, rec, "-o", color="#55A868", lw=2, label=f"{coll.upper()} recall (rescored)"
+    )
+    ax1.scatter(
+        [1],
+        [nr["recall_at_k"]],
+        color="#C44E52",
+        marker="X",
+        s=110,
+        zorder=5,
+        label=f"{coll.upper()} no rescore ({nr['recall_at_k']:.3f})",
+    )
     for x, r in zip(xs, rec):
-        ax1.annotate(f"{r:.3f}", (x, r), textcoords="offset points", xytext=(0, 8), ha="center")
+        ax1.annotate(
+            f"{r:.3f}", (x, r), textcoords="offset points", xytext=(0, 8), ha="center"
+        )
     ax1.set_xlabel("oversampling factor")
     ax1.set_ylabel("Recall@10")
     ax1.set_xticks(xs)

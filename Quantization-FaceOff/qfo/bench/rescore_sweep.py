@@ -7,6 +7,7 @@ oversample — the production lever that makes 16x compression usable.
 
 Read-only on the PQ collection. No drops.
 """
+
 import json
 import sys
 import time
@@ -58,10 +59,17 @@ def main():
     rows = []
     for label, rescore, oversampling in SWEEP:
         ids, lats = run_one(client, queries, K, rescore, oversampling)
-        m = {"label": label, "rescore": rescore, "oversampling": oversampling,
-             "recall_at_k": recall_at_k(ids, gt, K), **pctiles(lats)}
+        m = {
+            "label": label,
+            "rescore": rescore,
+            "oversampling": oversampling,
+            "recall_at_k": recall_at_k(ids, gt, K),
+            **pctiles(lats),
+        }
         rows.append(m)
-        print(f"{label:12} recall={m['recall_at_k']:.3f}  p50={m['latency_p50_ms']:.1f}ms")
+        print(
+            f"{label:12} recall={m['recall_at_k']:.3f}  p50={m['latency_p50_ms']:.1f}ms"
+        )
         log_run(f"{COLL}-{label.replace(' ', '_')}", m, group=f"rescore-{COLL}")
 
     out = results_path(f"rescore_sweep_{COLL}.json")

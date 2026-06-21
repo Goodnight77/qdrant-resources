@@ -3,6 +3,7 @@ Dataset: dbpedia-entities-openai-1M (OpenAI ada-002, 1536-d, cosine) high-dim te
 embeddings with title/text payload, so the quantization tradeoff is dramatic and the
 Qdrant UI shows real content.
 """
+
 import os
 
 from qdrant_client import models
@@ -17,6 +18,7 @@ def results_path(name):
     os.makedirs(RESULTS_DIR, exist_ok=True)
     return os.path.join(RESULTS_DIR, name)
 
+
 # dbpedia-openai facts
 DIM = 1536
 DISTANCE = models.Distance.COSINE
@@ -24,10 +26,10 @@ DISTANCE = models.Distance.COSINE
 # 100k = ~600MB embeddings, fast + tells the full story. Fixed at 100k: 1M needs
 # ~25GB disk (3 collections keep f32 originals) which doesn't fit my 15GB budget
 DATASET_N = 100_000
-N_QUERY = 1_000          # held out from the tail; NOT inserted into base
-K = 10                   # Recall@K
-GT_DEPTH = 100           # exact-NN depth to store as ground truth
-BATCH_SIZE = 500         # upsert batch (kept modest; 1536-d float vectors are large)
+N_QUERY = 1_000  # held out from the tail; NOT inserted into base
+K = 10  # Recall@K
+GT_DEPTH = 100  # exact-NN depth to store as ground truth
+BATCH_SIZE = 500  # upsert batch (kept modest; 1536-d float vectors are large)
 DATA_DIR = "data/dbpedia"
 
 # 3 configs under test. quantization=None => baseline f32.

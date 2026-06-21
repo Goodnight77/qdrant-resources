@@ -2,6 +2,7 @@
 Fires N queries across CONCURRENCY worker threads, measures queries/second + mean
 latency under load. Read-only on the collections. Logs to W&B group 'throughput'.
 """
+
 import json
 import threading
 import time
@@ -55,7 +56,9 @@ def main():
         }
         results[name] = m
         log_run(f"{name}-qps", m, group="throughput")
-        print(f"{name:9} {m['qps']:.0f} qps  mean {m['mean_latency_ms']:.1f}ms  (conc={CONCURRENCY})")
+        print(
+            f"{name:9} {m['qps']:.0f} qps  mean {m['mean_latency_ms']:.1f}ms  (conc={CONCURRENCY})"
+        )
 
     with open(results_path("throughput.json"), "w") as f:
         json.dump(results, f, indent=2)

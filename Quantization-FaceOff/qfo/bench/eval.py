@@ -3,6 +3,7 @@ log per-config metrics to W&B, dump results.json
 
 One pass per collection captures BOTH retrieved ids (recall) and latency (no double query).
 """
+
 import json
 import time
 
@@ -46,7 +47,7 @@ def main(n_queries=None):
     client = QdrantClient(url=QDRANT_URL, timeout=120)
     results = {}
     for name in COLLECTIONS:
-        search_collect(client, name, queries[:200], K)        # warm cache, discard
+        search_collect(client, name, queries[:200], K)  # warm cache, discard
         ids, lats = search_collect(client, name, queries, K)  # measured pass
         m = {
             "recall_at_k": recall_at_k(ids, gt, K),
@@ -66,5 +67,8 @@ def main(n_queries=None):
 
 if __name__ == "__main__":
     # money-path check
-    assert abs(recall_at_k(np.array([[1, 2, 3]]), np.array([[1, 2, 9, 8]]), 3) - 2 / 3) < 1e-9
+    assert (
+        abs(recall_at_k(np.array([[1, 2, 3]]), np.array([[1, 2, 9, 8]]), 3) - 2 / 3)
+        < 1e-9
+    )
     main()

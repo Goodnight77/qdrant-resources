@@ -9,6 +9,7 @@ Usage:
   uv run python search_demo.py                 # random seed article
   uv run python search_demo.py einstein        # first article whose title contains 'einstein'
 """
+
 import random
 import sys
 
@@ -39,7 +40,9 @@ def main():
     print(f"\nQuery article [{seed}]: {payload[seed]['title']}")
     print(f"  {payload[seed]['text'][:160]}...\n")
 
-    res = client.query_points("bq", query=base[seed].tolist(), limit=K + 1, search_params=RESCORE)
+    res = client.query_points(
+        "bq", query=base[seed].tolist(), limit=K + 1, search_params=RESCORE
+    )
     neighbors = [p for p in res.points if p.id != seed][:K]
     assert neighbors, "no neighbors returned"
 

@@ -1,11 +1,16 @@
 """Create the 3 collections (baseline / sq / pq) and load the dbpedia embeddings into each.
 Waits for optimizer to reach green before exiting (isolation guardrail)."""
+
 import time
 
 from qdrant_client import QdrantClient, models
 
 from qfo.config import (
-    QDRANT_URL, DIM, DISTANCE, BATCH_SIZE, COLLECTIONS,
+    QDRANT_URL,
+    DIM,
+    DISTANCE,
+    BATCH_SIZE,
+    COLLECTIONS,
 )
 from qfo.data.dbpedia import load_dbpedia
 
@@ -42,7 +47,7 @@ def main():
         client.upload_collection(
             collection_name=name,
             vectors=base,
-            payload=payload,      # title/text so the UI shows real content
+            payload=payload,  # title/text so the UI shows real content
             ids=ids,
             batch_size=BATCH_SIZE,
             parallel=4,

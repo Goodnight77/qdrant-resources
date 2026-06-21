@@ -5,6 +5,7 @@
 - cold-start vs warm-cache loops.
 One W&B run per config so the project dashboard compares them (table / parallel-coords).
 """
+
 import subprocess
 import time
 
@@ -21,8 +22,15 @@ PROJECT = "quantization-faceoff"
 def _to_mb(s):
     """'1.23GiB' / '512MiB' / '900B' -> megabytes (binary units)."""
     s = s.strip()
-    for unit, mult in (("GiB", 1024), ("MiB", 1), ("KiB", 1 / 1024),
-                       ("GB", 1000), ("MB", 1), ("kB", 1 / 1000), ("B", 1 / 1e6)):
+    for unit, mult in (
+        ("GiB", 1024),
+        ("MiB", 1),
+        ("KiB", 1 / 1024),
+        ("GB", 1000),
+        ("MB", 1),
+        ("kB", 1 / 1000),
+        ("B", 1 / 1e6),
+    ):
         if s.endswith(unit):
             return float(s[: -len(unit)]) * mult
     return float(s)  # bare number = bytes? treat as MB-less fallback
@@ -32,7 +40,9 @@ def container_rss_mb(container=CONTAINER):
     """Resident memory of the Qdrant container, in MB."""
     out = subprocess.run(
         ["docker", "stats", "--no-stream", "--format", "{{.MemUsage}}", container],
-        capture_output=True, text=True, check=True,
+        capture_output=True,
+        text=True,
+        check=True,
     ).stdout
     return _to_mb(out.split("/")[0])  # "used / limit"
 

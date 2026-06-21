@@ -4,6 +4,7 @@ existing baseline/sq/pq). Usage: uv run python add_bq.py [name]   default: bq
 Logic stays under __main__ + main(): upload_collection(parallel>1) uses process spawn
 on Windows, which re-imports this module — unguarded top-level code would re-run it.
 """
+
 import sys
 
 from qdrant_client import QdrantClient
@@ -20,8 +21,12 @@ def main():
     print(f"[{name}] create + upload {len(base)} vectors")
     make_collection(client, name, COLLECTIONS[name])
     client.upload_collection(
-        collection_name=name, vectors=base, payload=payload,
-        ids=list(range(len(base))), batch_size=BATCH_SIZE, parallel=4,
+        collection_name=name,
+        vectors=base,
+        payload=payload,
+        ids=list(range(len(base))),
+        batch_size=BATCH_SIZE,
+        parallel=4,
     )
     wait_green(client, name)
     print(f"[{name}] green, count={client.count(name).count}")

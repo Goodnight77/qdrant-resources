@@ -7,6 +7,7 @@ manual commands). Stops at the first failure.
 
 Note: ingest + add_bq rebuild the collections from scratch (drop + re-upload).
 """
+
 import subprocess
 import sys
 
@@ -28,7 +29,9 @@ STEPS = [
 
 def main():
     for i, (mod, args, desc) in enumerate(STEPS, 1):
-        print(f"\n=== [{i}/{len(STEPS)}] {mod} {' '.join(args)} - {desc} ===", flush=True)
+        print(
+            f"\n=== [{i}/{len(STEPS)}] {mod} {' '.join(args)} - {desc} ===", flush=True
+        )
         subprocess.run([sys.executable, "-m", mod, *args], check=True)
     print("\nfaceoff complete. charts in assets/, metrics in results/ + W&B.")
 
