@@ -46,7 +46,9 @@ def main():
         ax[0, 1].bar([i + (j - 1) * w for i in x],
                      [R[n][f"latency_{p}_ms"] for n in names], w, label=p, color=c)
     ax[0, 1].set_title("Latency (ms, lower = better)")
-    ax[0, 1].set_xticks(list(x)); ax[0, 1].set_xticklabels(labels); ax[0, 1].legend()
+    ax[0, 1].set_xticks(list(x))
+    ax[0, 1].set_xticklabels(labels)
+    ax[0, 1].legend()
 
     # memory (resident quantized vectors)
     ax[1, 0].bar(labels, [mem_mb[n] for n in names], color=colors)
@@ -63,7 +65,8 @@ def main():
         ax[1, 1].annotate(labels[i], (R[n]["latency_p50_ms"], R[n]["recall_at_k"]),
                           textcoords="offset points", xytext=(8, 0))
     ax[1, 1].set_title("Tradeoff: recall vs p50 latency (bubble = RAM)")
-    ax[1, 1].set_xlabel("p50 latency (ms)"); ax[1, 1].set_ylabel("recall@10")
+    ax[1, 1].set_xlabel("p50 latency (ms)")
+    ax[1, 1].set_ylabel("recall@10")
 
     plt.tight_layout(rect=[0, 0, 1, 0.97])
     path = os.path.join(OUT, "faceoff.png")

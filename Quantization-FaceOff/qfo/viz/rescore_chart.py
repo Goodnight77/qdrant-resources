@@ -39,8 +39,10 @@ def main():
                 label=f"{coll.upper()} no rescore ({nr['recall_at_k']:.3f})")
     for x, r in zip(xs, rec):
         ax1.annotate(f"{r:.3f}", (x, r), textcoords="offset points", xytext=(0, 8), ha="center")
-    ax1.set_xlabel("oversampling factor"); ax1.set_ylabel("Recall@10")
-    ax1.set_xticks(xs); ax1.set_ylim(min(nr["recall_at_k"], min(rec)) - 0.03, 1.01)
+    ax1.set_xlabel("oversampling factor")
+    ax1.set_ylabel("Recall@10")
+    ax1.set_xticks(xs)
+    ax1.set_ylim(min(nr["recall_at_k"], min(rec)) - 0.03, 1.01)
 
     ax2 = ax1.twinx()
     ax2.plot(xs, lat, "--s", color="#888", alpha=0.8, label="p50 latency")
