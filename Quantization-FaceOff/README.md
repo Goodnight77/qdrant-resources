@@ -1,5 +1,7 @@
 # Qdrant Quantization Face-Off
 
+> **Read the full write-up:** [16× Smaller Vectors in Qdrant: Memory, Recall, and Latency Results](https://medium.com/@mohammedarbinsibi/16-smaller-vectors-in-qdrant-memory-recall-and-latency-results-6081bda5092f)
+
 How much do you actually pay - in recall and latency - to shrink your vectors 4× or 16× in RAM?
 
 This benchmarks four native Qdrant configurations head-to-head on **high-dimensional text embeddings**, measuring the real tradeoff: **recall vs. latency vs. memory** - and how rescoring buys recall back.
