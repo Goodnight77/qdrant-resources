@@ -87,6 +87,7 @@ New to Qdrant? Here's how to get started:
 | --- | --- | --- | --- |
 | ✅ | **Chonkie** | Advanced text chunking with Qdrant handshake | [Tutorial](chonkie/Chonkie_Qdrant_Handshake.ipynb) |
 | 🚧 | **FastEmbed** | Fast, lightweight embedding library | Coming Soon |
+| ✅ | **bm25-go-hybrid** | Dense + sparse (BM25) hybrid search in Go, using a FastEmbed-compatible sparse encoder | [Demo](bm25-go-hybrid/) |
 | 🚧 | **LangChain** | Python framework for LLM applications | Coming Soon |
 | 🚧 | **LlamaIndex** | Data framework for LLM applications | Coming Soon |
 
