@@ -1,0 +1,12 @@
+# Local Qdrant for the quantization faceoff. NOT Qdrant Cloud (network jitter corrupts latency).
+# Pinned to latest stable as of build; >=1.18 required for TurboQuant.
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.18.2
+    container_name: qfo-qdrant
+    ports:
+      - "6333:6333"   # REST
+      - "6334:6334"   # gRPC
+    volumes:
+      - ./data/qdrant_storage:/qdrant/storage
+    # defaults are fine for a single-node bench; add mem limits only if profiling the container itself.

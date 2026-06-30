@@ -40,6 +40,7 @@ New to Qdrant? Here's how to get started:
 3. **Multimodal Search?** Check out [Gemini Embeddings](Gemini-embeddings/) - **✅ Ready!**
 4. **Efficient Embeddings?** Learn about [Matryoshka MRL](Matryoshka-MRL/) - **✅ Ready!**
 5. **Vector Compression?** Read about [Google TurboQuant](TurboQuant/) - **✅ Ready!**
+6. **Quantization tradeoffs?** Compare them in the [Quantization Face-Off](Quantization-FaceOff/) - **✅ Ready!**
 
 <hr>
 
@@ -62,7 +63,6 @@ New to Qdrant? Here's how to get started:
 - **[TurboQuant](TurboQuant/)** - High-recall vector quantization and memory-efficient search
 
 ### 🚧 **Coming Soon**
-- **[Quantization](quantization/)** - Vector quantization techniques (in development)
 - **[RAG Applications](RAG/)** - LangChain & LlamaIndex tutorials (in development)
 - **[Agent Workflows](Agents/)** - LangGraph implementations (in development) 
 - **[Image Recommendations](img_recom/)** - Computer vision search systems (planned)
@@ -75,6 +75,7 @@ New to Qdrant? Here's how to get started:
 
 | Status | Project | Description | Key Features |
 | --- | --- | --- | --- |
+| ✅ | **[Quantization Face-Off](Quantization-FaceOff/)** | Head-to-head benchmark of Qdrant quantization (f32 / SQ / PQ / BQ) on 1M-scale text embeddings | Recall vs latency vs RAM, rescoring sweeps, cost analysis, W&B telemetry |
 | ✅ | **[Chonkie Integration](chonkie/)** | Text chunking with seamless Qdrant integration | Multiple chunking strategies, performance comparison |
 | 🚧 | **Image Recommendations** | Image similarity search systems (in development) | Computer vision, embeddings, similarity search |
 | 🚧 | **Agent Workflows** | AI agent implementations (planned) | LangGraph, agentic RAG, vector memory |
