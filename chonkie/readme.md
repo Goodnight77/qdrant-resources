@@ -1,5 +1,7 @@
 # Chonkie and Qdrant Integration
 
+**[Read the companion article here](https://medium.com/@mohammedarbinsibi/from-fragile-to-agentic-rag-with-smolagents-chonkie-and-qdrant-d11197c95ab8)**
+
 <!-- ![Chonkie Logo](assets/chonkie.png) -->
 ![handshake](../assets/handshake.png)
 

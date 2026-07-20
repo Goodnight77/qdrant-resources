@@ -21,6 +21,7 @@
     <a href="#official-qdrant-links">Official Qdrant Links</a> |
     <a href="#tutorials">Tutorials</a> |
     <a href="#projects">Projects</a> |
+    <a href="ARTICLES.md">Articles</a> |
     <a href="#integrations">Integrations</a> |
     <a href="#contributing">Contributing</a>
   </h3>
@@ -92,6 +93,12 @@ New to Qdrant? Here's how to get started:
 | ✅ | **Haystack** | Qdrant Cloud as vector database inside a Haystack pipeline, with payload indexing and metadata filtering | [Tutorial](haystack-qdrant/) |
 | 🚧 | **LangChain** | Python framework for LLM applications | Coming Soon |
 | 🚧 | **LlamaIndex** | Data framework for LLM applications | Coming Soon |
+
+<hr>
+
+## Articles
+
+Blog posts behind these tutorials, plus deep dives with no repo counterpart — see [ARTICLES.md](ARTICLES.md) for the full, ordered index.
 
 <hr>
 
