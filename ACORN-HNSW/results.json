@@ -1,0 +1,151 @@
+{
+  "rows": [
+    {
+      "label": "0.1%",
+      "selectivity": 0.001055,
+      "vanilla_recall": 0.006000000000000001,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 0.0,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.8522574999669814,
+      "acorn_ms": 17.074574500043127,
+      "vanilla_ms_p95": 3.6371967999912154,
+      "acorn_ms_p95": 20.661748850056938,
+      "default_recall": 1.0,
+      "default_ms": 17.220616500026154
+    },
+    {
+      "label": "1%",
+      "selectivity": 0.00986,
+      "vanilla_recall": 0.524,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 0.2,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.492315000040435,
+      "acorn_ms": 19.459652000023198,
+      "vanilla_ms_p95": 2.9096688000663558,
+      "acorn_ms_p95": 26.836968150030312,
+      "default_recall": 1.0,
+      "default_ms": 17.89450100011436
+    },
+    {
+      "label": "4%",
+      "selectivity": 0.04038,
+      "vanilla_recall": 0.934,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 0.8,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 3.962646500099254,
+      "acorn_ms": 20.780767000019296,
+      "vanilla_ms_p95": 4.493541000044843,
+      "acorn_ms_p95": 21.486051799990946,
+      "default_recall": 1.0,
+      "default_ms": 21.063298999933977
+    },
+    {
+      "label": "11%",
+      "selectivity": 0.11086,
+      "vanilla_recall": 0.998,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 1.0,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.6389360000393935,
+      "acorn_ms": 21.15849300002992,
+      "vanilla_ms_p95": 2.959830300028443,
+      "acorn_ms_p95": 22.722050000083982,
+      "default_recall": 1.0,
+      "default_ms": 21.14043550000133
+    },
+    {
+      "label": "25%",
+      "selectivity": 0.24975,
+      "vanilla_recall": 1.0,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 1.0,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.5130215001354372,
+      "acorn_ms": 20.774802000005366,
+      "vanilla_ms_p95": 2.923772899998766,
+      "acorn_ms_p95": 23.62162075011156,
+      "default_recall": 1.0,
+      "default_ms": 20.507955500079333
+    },
+    {
+      "label": "50%",
+      "selectivity": 0.50057,
+      "vanilla_recall": 1.0,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 1.0,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.6137544999755846,
+      "acorn_ms": 12.409922500069115,
+      "vanilla_ms_p95": 3.2786159499892165,
+      "acorn_ms_p95": 13.55789324993566,
+      "default_recall": 1.0,
+      "default_ms": 2.4141170000575585
+    },
+    {
+      "label": "90%",
+      "selectivity": 0.90054,
+      "vanilla_recall": 1.0,
+      "acorn_recall": 1.0,
+      "vanilla_recall_p10": 1.0,
+      "acorn_recall_p10": 1.0,
+      "vanilla_ms": 2.494447999993099,
+      "acorn_ms": 3.4058740000091348,
+      "vanilla_ms_p95": 3.0703137999580568,
+      "acorn_ms_p95": 3.9382466000688505,
+      "default_recall": 1.0,
+      "default_ms": 3.2386670001187667
+    }
+  ],
+  "sweep": [
+    {
+      "ef": 16,
+      "vanilla_recall": 0.23399999999999999,
+      "acorn_recall": 0.9940000000000001,
+      "vanilla_ms": 2.86198800006332,
+      "acorn_ms": 10.161882000033984
+    },
+    {
+      "ef": 32,
+      "vanilla_recall": 0.37599999999999995,
+      "acorn_recall": 1.0,
+      "vanilla_ms": 2.1622205000539907,
+      "acorn_ms": 13.135282000007464
+    },
+    {
+      "ef": 64,
+      "vanilla_recall": 0.524,
+      "acorn_recall": 1.0,
+      "vanilla_ms": 2.3676585000202977,
+      "acorn_ms": 18.678197999975055
+    },
+    {
+      "ef": 128,
+      "vanilla_recall": 0.6999999999999998,
+      "acorn_recall": 1.0,
+      "vanilla_ms": 2.8631765001136955,
+      "acorn_ms": 25.075097000012647
+    },
+    {
+      "ef": 256,
+      "vanilla_recall": 0.7919999999999999,
+      "acorn_recall": 1.0,
+      "vanilla_ms": 3.1699405000154,
+      "acorn_ms": 41.33536999995613
+    },
+    {
+      "ef": 512,
+      "vanilla_recall": 0.904,
+      "acorn_recall": 1.0,
+      "vanilla_ms": 4.433554500110404,
+      "acorn_ms": 72.22519899994495
+    }
+  ],
+  "n": 200000,
+  "dim": 96,
+  "k": 10,
+  "base_recall": 1.0,
+  "base_ms": 2.43535200002043
+}
