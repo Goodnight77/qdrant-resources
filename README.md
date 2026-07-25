@@ -37,7 +37,7 @@
 New to Qdrant? Here's how to get started:
 
 1. **First time with Qdrant?** Start with our [Qdrant 101 tutorial](Qdrant-101/qdrant_101_tutorial.ipynb)**✅ Ready!**
-2. **Text chunking with Qdrant?** Try the [Chonkie Integration](chonkie/Chonkie_Qdrant_Handshake.ipynb) - **✅ Ready!**
+2. **Text chunking with Qdrant?** Try the [Chonkie Integration](chonkie/Chonkie_Qdrant_Handshake_READY.ipynb) - **✅ Ready!**
 3. **Multimodal Search?** Check out [Gemini Embeddings](Gemini-embeddings/) - **✅ Ready!**
 4. **Efficient Embeddings?** Learn about [Matryoshka MRL](Matryoshka-MRL/) - **✅ Ready!**
 5. **Vector Compression?** Read about [Google TurboQuant](TurboQuant/) - **✅ Ready!**
@@ -65,9 +65,9 @@ New to Qdrant? Here's how to get started:
 
 ### 🚧 **Coming Soon**
 - **[RAG Applications](RAG/)** - LangChain & LlamaIndex tutorials (in development)
-- **[Agent Workflows](Agents/)** - LangGraph implementations (in development) 
-- **[Image Recommendations](img_recom/)** - Computer vision search systems (planned)
-- **[Embeddings](embeddings/)** - Matryoshka embeddings and advanced strategies (in development)
+- **Agent Workflows** - LangGraph implementations (in development)
+- **Image Recommendations** - Computer vision search systems (planned)
+- **Embeddings** - Matryoshka embeddings and advanced strategies (in development)
 
 
 <hr>
@@ -87,7 +87,7 @@ New to Qdrant? Here's how to get started:
 
 | Status | Integration | Description | Tutorial |
 | --- | --- | --- | --- |
-| ✅ | **Chonkie** | Advanced text chunking with Qdrant handshake | [Tutorial](chonkie/Chonkie_Qdrant_Handshake.ipynb) |
+| ✅ | **Chonkie** | Advanced text chunking with Qdrant handshake | [Tutorial](chonkie/Chonkie_Qdrant_Handshake_READY.ipynb) |
 | 🚧 | **FastEmbed** | Fast, lightweight embedding library | Coming Soon |
 | ✅ | **bm25-go-hybrid** | Dense + sparse (BM25) hybrid search in Go, using a FastEmbed-compatible sparse encoder | [Demo](bm25-go-hybrid/) |
 | ✅ | **Haystack** | Qdrant Cloud as vector database inside a Haystack pipeline, with payload indexing and metadata filtering | [Tutorial](haystack-qdrant/) |

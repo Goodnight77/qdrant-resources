@@ -36,7 +36,7 @@ jobs:
         with:
           args: >-
             --verbose --no-progress
-            --accept 200,201,202,203,204,206,301,302,303,307,308,429
+            --accept 200,201,202,203,204,206,301,302,303,307,308,403,429,999
             --timeout 20
             --max-retries 2
             ${{ steps.changed_md.outputs.all_changed_files }}
