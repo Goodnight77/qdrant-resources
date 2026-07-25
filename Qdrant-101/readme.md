@@ -1,5 +1,7 @@
 # Qdrant 101: Getting Started Tutorial
 
+**[Read the companion article here](https://medium.com/@mohammedarbinsibi/why-qdrant-will-be-your-favorite-vector-database-setup-in-10-minutes-bc0a79651a14)**
+
 A comprehensive beginner's guide to Qdrant vector database fundamentals.
 
 ## What You'll Learn

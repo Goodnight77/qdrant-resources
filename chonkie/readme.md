@@ -1,5 +1,7 @@
 # Chonkie and Qdrant Integration
 
+**[Read the companion article here](https://medium.com/@mohammedarbinsibi/from-fragile-to-agentic-rag-with-smolagents-chonkie-and-qdrant-d11197c95ab8)**
+
 <!-- ![Chonkie Logo](assets/chonkie.png) -->
 ![handshake](../assets/handshake.png)
 
@@ -50,10 +52,10 @@ The notebook demonstrates how Chonkie's built-in Qdrant connector enables you to
 Perfect for building RAG systems, semantic search, and document processing applications! 
 
 ### References 
-* [Chonkie Qdrant Handshake](https://docs.chonkie.ai/python-sdk/handshakes/qdrant-handshake)
-* [Chonkie Documentation](https://docs.chonkie.ai/python-sdk/getting-started/introduction)
+* [Chonkie Qdrant Handshake](https://docs.chonkie.ai/oss/handshakes/qdrant-handshake)
+* [Chonkie Documentation](https://docs.chonkie.ai/oss/quick-start)
 * [Qdrant Documentation](https://qdrant.tech/documentation/)
-* [Other Chonkie Handshakes](https://docs.chonkie.ai/python-sdk/handshakes/overview)
+* [Other Chonkie Handshakes](https://docs.chonkie.ai/oss/handshakes/overview)
 
 ---
 

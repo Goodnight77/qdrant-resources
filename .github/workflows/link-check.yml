@@ -1,0 +1,47 @@
+name: Link Check
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lychee:
+    name: Check links
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed Markdown files
+        id: changed_md
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            **/*.md
+
+      - name: Link Checker
+        if: steps.changed_md.outputs.any_changed == 'true'
+        id: lychee
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --verbose --no-progress
+            --accept 200,201,202,203,204,206,301,302,303,307,308,403,429,999
+            --timeout 20
+            --max-retries 2
+            ${{ steps.changed_md.outputs.all_changed_files }}
+          fail: true
+
+      - name: No Markdown changes
+        if: steps.changed_md.outputs.any_changed != 'true'
+        run: echo "No Markdown files changed."
