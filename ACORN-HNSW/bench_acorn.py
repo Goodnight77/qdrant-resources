@@ -13,6 +13,7 @@ Design:
 """
 
 import time
+
 import numpy as np
 from qdrant_client import QdrantClient, models
 
@@ -30,14 +31,15 @@ client = QdrantClient(url="http://localhost:6333", timeout=600)
 # combined: two fields with V values each -> 1/V^2
 # single:  one field with given probability of the target value
 LEVELS = [
-    ("0.1%", ("combined", 32)),   # 1/1024 ~ 0.098%
-    ("1%",   ("combined", 10)),   # 1/100
-    ("4%",   ("combined", 5)),    # 1/25
-    ("11%",  ("combined", 3)),    # 1/9
-    ("25%",  ("combined", 2)),    # 1/4
-    ("50%",  ("single", 0.50)),
-    ("90%",  ("single", 0.90)),
+    ("0.1%", ("combined", 32)),  # 1/1024 ~ 0.098%
+    ("1%", ("combined", 10)),  # 1/100
+    ("4%", ("combined", 5)),  # 1/25
+    ("11%", ("combined", 3)),  # 1/9
+    ("25%", ("combined", 2)),  # 1/4
+    ("50%", ("single", 0.50)),
+    ("90%", ("single", 0.90)),
 ]
+
 
 def build_payloads():
     """One payload dict per point, with all fields for all levels."""
@@ -51,8 +53,10 @@ def build_payloads():
             payload_fields[f"s{int(p*100)}"] = (rng.random(N) < p).astype(int)
     return payload_fields
 
+
 N_CLUSTERS = 1024
 CENTERS = rng.standard_normal((N_CLUSTERS, DIM)).astype(np.float32)
+
 
 def make_vectors():
     """Clustered data: a mixture of Gaussians, like real embeddings."""
@@ -61,6 +65,7 @@ def make_vectors():
     v /= np.linalg.norm(v, axis=1, keepdims=True)
     return v.astype(np.float32)
 
+
 def make_queries(n):
     """Queries near real clusters, like real user queries."""
     assign = rng.integers(0, N_CLUSTERS, n)
@@ -68,17 +73,25 @@ def make_queries(n):
     q /= np.linalg.norm(q, axis=1, keepdims=True)
     return q.astype(np.float32)
 
+
 def make_filter(level):
-    label, (kind, v) = level
+    _label, (kind, v) = level
     if kind == "combined":
-        return models.Filter(must=[
-            models.FieldCondition(key=f"a{v}", match=models.MatchValue(value=0)),
-            models.FieldCondition(key=f"b{v}", match=models.MatchValue(value=0)),
-        ])
+        return models.Filter(
+            must=[
+                models.FieldCondition(key=f"a{v}", match=models.MatchValue(value=0)),
+                models.FieldCondition(key=f"b{v}", match=models.MatchValue(value=0)),
+            ]
+        )
     else:
-        return models.Filter(must=[
-            models.FieldCondition(key=f"s{int(v*100)}", match=models.MatchValue(value=1)),
-        ])
+        return models.Filter(
+            must=[
+                models.FieldCondition(
+                    key=f"s{int(v*100)}", match=models.MatchValue(value=1)
+                ),
+            ]
+        )
+
 
 def setup():
     if client.collection_exists(COLL):
@@ -92,23 +105,30 @@ def setup():
             full_scan_threshold=10,  # force graph traversal, no brute-force fallback
         ),
         optimizers_config=models.OptimizersConfigDiff(
-            default_segment_number=1, max_segment_size=800_000,
+            default_segment_number=1,
+            max_segment_size=800_000,
         ),
     )
 
     payload_fields = build_payloads()
     for field in payload_fields:
         client.create_payload_index(
-            collection_name=COLL, field_name=field,
+            collection_name=COLL,
+            field_name=field,
             field_schema=models.PayloadSchemaType.INTEGER,
         )
 
     print("uploading vectors ...")
     vectors = make_vectors()
-    payloads = ({f: int(payload_fields[f][i]) for f in payload_fields} for i in range(N))
+    payloads = (
+        {f: int(payload_fields[f][i]) for f in payload_fields} for i in range(N)
+    )
     client.upload_collection(
-        collection_name=COLL, vectors=vectors, payload=payloads,
-        ids=range(N), batch_size=2048,
+        collection_name=COLL,
+        vectors=vectors,
+        payload=payloads,
+        ids=range(N),
+        batch_size=2048,
     )
 
     print("waiting for indexing ...")
@@ -119,17 +139,22 @@ def setup():
         time.sleep(3)
     print("indexed. segments ready.")
 
+
 def run_queries(queries, flt, search_params, limit=K):
     results, times = [], []
     for q in queries:
         t0 = time.perf_counter()
         res = client.query_points(
-            collection_name=COLL, query=q.tolist(),
-            query_filter=flt, search_params=search_params, limit=limit,
+            collection_name=COLL,
+            query=q.tolist(),
+            query_filter=flt,
+            search_params=search_params,
+            limit=limit,
         )
         times.append((time.perf_counter() - t0) * 1000)
         results.append([p.id for p in res.points])
     return results, times
+
 
 def recall(approx_ids, exact_ids):
     vals = []
@@ -138,6 +163,7 @@ def recall(approx_ids, exact_ids):
             continue
         vals.append(len(set(a) & set(e)) / len(e))
     return vals
+
 
 def main():
     setup()
@@ -178,24 +204,31 @@ def main():
 
         # ACORN with default threshold: only activates below 40% selectivity
         d_params = models.SearchParams(
-            hnsw_ef=64, acorn=models.AcornSearchParams(enable=True))
+            hnsw_ef=64, acorn=models.AcornSearchParams(enable=True)
+        )
         d_ids, d_t = run_queries(queries, flt, d_params)
         d_rec = recall(d_ids, exact_ids)
 
-        row = dict(
-            label=label, selectivity=sel,
-            vanilla_recall=float(np.mean(v_rec)), acorn_recall=float(np.mean(a_rec)),
-            vanilla_recall_p10=float(np.percentile(v_rec, 10)),
-            acorn_recall_p10=float(np.percentile(a_rec, 10)),
-            vanilla_ms=float(np.median(v_t)), acorn_ms=float(np.median(a_t)),
-            vanilla_ms_p95=float(np.percentile(v_t, 95)),
-            acorn_ms_p95=float(np.percentile(a_t, 95)),
-            default_recall=float(np.mean(d_rec)), default_ms=float(np.median(d_t)),
-        )
+        row = {
+            "label": label,
+            "selectivity": sel,
+            "vanilla_recall": float(np.mean(v_rec)),
+            "acorn_recall": float(np.mean(a_rec)),
+            "vanilla_recall_p10": float(np.percentile(v_rec, 10)),
+            "acorn_recall_p10": float(np.percentile(a_rec, 10)),
+            "vanilla_ms": float(np.median(v_t)),
+            "acorn_ms": float(np.median(a_t)),
+            "vanilla_ms_p95": float(np.percentile(v_t, 95)),
+            "acorn_ms_p95": float(np.percentile(a_t, 95)),
+            "default_recall": float(np.mean(d_rec)),
+            "default_ms": float(np.median(d_t)),
+        }
         rows.append(row)
-        print(f"{label:>5}  sel={sel:.4f}  "
-              f"recall v={row['vanilla_recall']:.3f} a={row['acorn_recall']:.3f}  "
-              f"lat v={row['vanilla_ms']:.1f}ms a={row['acorn_ms']:.1f}ms")
+        print(
+            f"{label:>5}  sel={sel:.4f}  "
+            f"recall v={row['vanilla_recall']:.3f} a={row['acorn_recall']:.3f}  "
+            f"lat v={row['vanilla_ms']:.1f}ms a={row['acorn_ms']:.1f}ms"
+        )
 
     # ef sweep at the ~1% level: the classic recall/latency tradeoff curve
     level = LEVELS[1]
@@ -205,22 +238,41 @@ def main():
     for ef in [16, 32, 64, 128, 256, 512]:
         v_ids, v_t = run_queries(queries, flt, models.SearchParams(hnsw_ef=ef))
         a_params = models.SearchParams(
-            hnsw_ef=ef, acorn=models.AcornSearchParams(enable=True, max_selectivity=1.0))
+            hnsw_ef=ef, acorn=models.AcornSearchParams(enable=True, max_selectivity=1.0)
+        )
         a_ids, a_t = run_queries(queries, flt, a_params)
-        sweep.append(dict(
-            ef=ef,
-            vanilla_recall=float(np.mean(recall(v_ids, exact_ids))),
-            acorn_recall=float(np.mean(recall(a_ids, exact_ids))),
-            vanilla_ms=float(np.median(v_t)), acorn_ms=float(np.median(a_t)),
-        ))
-        print(f"ef={ef:>3}  v: r={sweep[-1]['vanilla_recall']:.3f} {sweep[-1]['vanilla_ms']:.1f}ms | "
-              f"a: r={sweep[-1]['acorn_recall']:.3f} {sweep[-1]['acorn_ms']:.1f}ms")
+        sweep.append(
+            {
+                "ef": ef,
+                "vanilla_recall": float(np.mean(recall(v_ids, exact_ids))),
+                "acorn_recall": float(np.mean(recall(a_ids, exact_ids))),
+                "vanilla_ms": float(np.median(v_t)),
+                "acorn_ms": float(np.median(a_t)),
+            }
+        )
+        print(
+            f"ef={ef:>3}  v: r={sweep[-1]['vanilla_recall']:.3f} {sweep[-1]['vanilla_ms']:.1f}ms | "
+            f"a: r={sweep[-1]['acorn_recall']:.3f} {sweep[-1]['acorn_ms']:.1f}ms"
+        )
 
     import json
+
     with open("results.json", "w") as f:
-        json.dump(dict(rows=rows, sweep=sweep, n=N, dim=DIM, k=K,
-                       base_recall=base_recall, base_ms=base_ms), f, indent=2)
+        json.dump(
+            {
+                "rows": rows,
+                "sweep": sweep,
+                "n": N,
+                "dim": DIM,
+                "k": K,
+                "base_recall": base_recall,
+                "base_ms": base_ms,
+            },
+            f,
+            indent=2,
+        )
     print("saved results.json")
+
 
 if __name__ == "__main__":
     main()
