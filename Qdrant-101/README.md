@@ -1,5 +1,7 @@
 # Qdrant 101: Getting Started Tutorial
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Goodnight77/qdrant-resources/blob/main/Qdrant-101/qdrant_101_tutorial.ipynb)
+
 **[Read the companion article here](https://medium.com/@mohammedarbinsibi/why-qdrant-will-be-your-favorite-vector-database-setup-in-10-minutes-bc0a79651a14)**
 
 A comprehensive beginner's guide to Qdrant vector database fundamentals.
@@ -61,7 +63,7 @@ matplotlib
 - Exploring AI-powered recommendations
 
 ## References
-- [Qdrant Homepage](http://qdrant.tech/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
+- [Qdrant Homepage](https://qdrant.tech/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Qdrant Documentation](https://qdrant.tech/documentation/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Qdrant Cloud Signup](https://cloud.qdrant.io/signup?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Qdrant Newsletter](https://qdrant.tech/subscribe/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)

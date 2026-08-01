@@ -1,8 +1,9 @@
 # Chonkie and Qdrant Integration
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Goodnight77/qdrant-resources/blob/main/chonkie/Chonkie_Qdrant_Handshake_READY.ipynb)
+
 **[Read the companion article here](https://medium.com/@mohammedarbinsibi/from-fragile-to-agentic-rag-with-smolagents-chonkie-and-qdrant-d11197c95ab8)**
 
-<!-- ![Chonkie Logo](assets/chonkie.png) -->
 <p align="center">
   <img src="../assets/handshake.png" alt="Chonkie and Qdrant handshake">
 </p>

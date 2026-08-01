@@ -1,5 +1,7 @@
 # TurboQuant & Qdrant
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Goodnight77/qdrant-resources/blob/main/TurboQuant/TurboQuant-Qdrant.ipynb)
+
 **[Read the full blog post here](https://mohamedarbi.xyz/posts/turboquant-qdrant)**
 
 TurboQuant is a vector quantization approach for reducing vector memory usage while keeping search quality high. It is designed for large embedding collections where storing full-precision vectors in RAM becomes expensive.

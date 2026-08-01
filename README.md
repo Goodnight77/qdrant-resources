@@ -74,6 +74,7 @@ New to Qdrant? Here's how to get started:
 - **[Matryoshka MRL](Matryoshka-MRL/)** - Matryoshka Representation Learning (MRL) concepts
 - **[TurboQuant](TurboQuant/)** - High-recall vector quantization and memory-efficient search
 - **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** - Runnable demos for Turbo4, memory tiers, prefix matching, and parallel scrolling
+- **[Haystack + Qdrant](haystack-qdrant/)** - Qdrant Cloud integration with semantic retrieval and metadata filtering
 
 ### 🚧 **Coming Soon**
 - **[RAG Applications](RAG/)** - RAG resources and the practical [Just-RAG implementation](https://github.com/Goodnight77/Just-RAG)
