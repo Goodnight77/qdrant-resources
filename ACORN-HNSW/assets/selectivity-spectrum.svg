@@ -1,0 +1,50 @@
+<svg viewBox="0 0 980 360" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+  <rect x="0" y="0" width="980" height="360" fill="#ffffff"/>
+
+  <text x="490" y="38" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">Filter selectivity: where each strategy lives</text>
+
+  <!-- axis -->
+  <line x1="70" y1="270" x2="910" y2="270" stroke="#0f172a" stroke-width="2"/>
+  <polygon points="910,270 898,264 898,276" fill="#0f172a"/>
+  <text x="490" y="310" text-anchor="middle" font-size="14" fill="#334155">% of points that pass the filter (selectivity)</text>
+
+  <!-- ticks -->
+  <g font-size="13" fill="#475569" text-anchor="middle">
+    <line x1="110" y1="265" x2="110" y2="275" stroke="#0f172a"/><text x="110" y="292">0.1%</text>
+    <line x1="290" y1="265" x2="290" y2="275" stroke="#0f172a"/><text x="290" y="292">1%</text>
+    <line x1="470" y1="265" x2="470" y2="275" stroke="#0f172a"/><text x="470" y="292">10%</text>
+    <line x1="650" y1="265" x2="650" y2="275" stroke="#0f172a"/><text x="650" y="292">40%</text>
+    <line x1="850" y1="265" x2="850" y2="275" stroke="#0f172a"/><text x="850" y="292">90%</text>
+  </g>
+
+  <!-- zones -->
+  <!-- zone 1: brute force -->
+  <rect x="75" y="80" width="150" height="170" rx="10" fill="#dbeafe" stroke="#93c5fd"/>
+  <text x="150" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="#1d4ed8">Tiny subset</text>
+  <text x="150" y="136" text-anchor="middle" font-size="12.5" fill="#1e3a5f">planner brute-forces</text>
+  <text x="150" y="154" text-anchor="middle" font-size="12.5" fill="#1e3a5f">the filtered points</text>
+  <text x="150" y="180" text-anchor="middle" font-size="12.5" fill="#1e3a5f">recall = 1.0</text>
+  <text x="150" y="198" text-anchor="middle" font-size="12.5" fill="#1e3a5f">cost grows with</text>
+  <text x="150" y="216" text-anchor="middle" font-size="12.5" fill="#1e3a5f">subset size</text>
+
+  <!-- zone 2: danger zone -->
+  <rect x="240" y="80" width="330" height="170" rx="10" fill="#fee2e2" stroke="#fca5a5"/>
+  <text x="405" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="#b91c1c">The danger zone</text>
+  <text x="405" y="136" text-anchor="middle" font-size="12.5" fill="#7f1d1d">too many points to brute-force,</text>
+  <text x="405" y="154" text-anchor="middle" font-size="12.5" fill="#7f1d1d">too few to keep the graph connected</text>
+  <text x="405" y="180" text-anchor="middle" font-size="13" font-weight="700" fill="#b91c1c">recall drops here</text>
+  <text x="405" y="204" text-anchor="middle" font-size="12.5" fill="#166534" font-weight="700">this is where ACORN earns its cost</text>
+  <text x="405" y="226" text-anchor="middle" font-size="12" fill="#7f1d1d">worst with combined filters (a=x AND b=y)</text>
+
+  <!-- zone 3: hnsw fine -->
+  <rect x="585" y="80" width="320" height="170" rx="10" fill="#dcfce7" stroke="#86efac"/>
+  <text x="745" y="112" text-anchor="middle" font-size="15" font-weight="700" fill="#15803d">Loose filter</text>
+  <text x="745" y="136" text-anchor="middle" font-size="12.5" fill="#14532d">most neighbors pass anyway,</text>
+  <text x="745" y="154" text-anchor="middle" font-size="12.5" fill="#14532d">the graph stays connected</text>
+  <text x="745" y="180" text-anchor="middle" font-size="12.5" fill="#14532d">vanilla filterable HNSW is enough</text>
+  <text x="745" y="204" text-anchor="middle" font-size="12.5" fill="#14532d">ACORN would only add latency</text>
+
+  <!-- acorn default threshold marker -->
+  <line x1="650" y1="62" x2="650" y2="270" stroke="#f59e0b" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <text x="650" y="55" text-anchor="middle" font-size="12.5" fill="#b45309" font-weight="700">max_selectivity = 0.4 (default cutoff)</text>
+</svg>
