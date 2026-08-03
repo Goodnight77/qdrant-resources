@@ -45,9 +45,13 @@ python make_charts.py
 | 4% | 0.934 | 1.000 |
 | 11%+ | ~1.000 | 1.000 |
 
+![Recall@10 for vanilla filtered HNSW vs ACORN across filter selectivity](assets/recall-vs-selectivity.png)
+
 ACORN costs roughly 7-8x latency in the danger zone (2.5 ms -> ~20 ms on this
 machine), and with the default threshold it deactivates automatically above 40%
 selectivity, falling back to vanilla speed.
+
+![Latency for vanilla vs ACORN vs ACORN with the default threshold](assets/latency-vs-selectivity.png)
 
 ## References
 
