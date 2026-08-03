@@ -1,6 +1,6 @@
 # ACORN vs Vanilla Filtered HNSW (Qdrant 1.16)
 
-Benchmark code for the blog post **"ACORN: The Second Hop That Saves Filtered Vector Search"**.
+Benchmark code comparing ACORN vs vanilla filtered HNSW in Qdrant.
 
 It measures recall@10 and latency for vanilla filtered HNSW vs the ACORN search
 algorithm (new in Qdrant 1.16) across filter selectivity levels from 0.1% to 90%.
