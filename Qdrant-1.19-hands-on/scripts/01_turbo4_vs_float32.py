@@ -18,9 +18,8 @@ then compares recall@10 of each collection vs an exact numpy brute-force search.
 import time
 
 import numpy as np
+from common import DIM, brute_force_topk, get_client, make_vectors, recall_at_k
 from qdrant_client import models
-
-from common import get_client, make_vectors, brute_force_topk, recall_at_k, DIM
 
 N_QUERIES = 50
 K = 10
@@ -54,11 +53,15 @@ def upload(client, name: str, vectors: np.ndarray, max_wait_s: float = 60.0):
         time.sleep(0.5)
 
 
-def measure_recall(client, name: str, vectors: np.ndarray, queries: np.ndarray) -> float:
+def measure_recall(
+    client, name: str, vectors: np.ndarray, queries: np.ndarray
+) -> float:
     recalls = []
     for q in queries:
         truth = brute_force_topk(vectors, q, k=K)
-        hits = client.query_points(collection_name=name, query=q.tolist(), limit=K).points
+        hits = client.query_points(
+            collection_name=name, query=q.tolist(), limit=K
+        ).points
         retrieved = [h.id for h in hits]
         recalls.append(recall_at_k(truth, retrieved))
     return float(np.mean(recalls))
@@ -69,8 +72,10 @@ def main():
     vectors = make_vectors()
     queries = make_vectors(n=N_QUERIES, seed=123)
 
-    print(f"dataset: {len(vectors)} vectors x {DIM} dims (float32 raw = "
-          f"{vectors.nbytes / 1024 / 1024:.1f} MB in numpy)\n")
+    print(
+        f"dataset: {len(vectors)} vectors x {DIM} dims (float32 raw = "
+        f"{vectors.nbytes / 1024 / 1024:.1f} MB in numpy)\n"
+    )
 
     results = {}
     for name, dtype in [
@@ -86,23 +91,33 @@ def main():
         elapsed = time.perf_counter() - t0
 
         results[name] = (recall, elapsed)
-        print(f"   recall@{K} = {recall:.4f}   ({N_QUERIES} queries in {elapsed:.2f}s)\n")
+        print(
+            f"   recall@{K} = {recall:.4f}   ({N_QUERIES} queries in {elapsed:.2f}s)\n"
+        )
 
     # theoretical storage math (what the release blog describes):
     float32_bits = 32
     turbo4_bits = 4
     print("storage per coordinate:")
     print(f"   float32 storage           : {float32_bits} bits")
-    print(f"   1.18 TQ quantization      : {float32_bits} + {turbo4_bits} = 36 bits "
-          f"(original on disk + 4-bit copy)")
-    print(f"   1.19 turbo4 datatype      : {turbo4_bits} bits only  "
-          f"-> {36 / turbo4_bits:.0f}x smaller than the two-copy model")
+    print(
+        f"   1.18 TQ quantization      : {float32_bits} + {turbo4_bits} = 36 bits "
+        f"(original on disk + 4-bit copy)"
+    )
+    print(
+        f"   1.19 turbo4 datatype      : {turbo4_bits} bits only  "
+        f"-> {36 / turbo4_bits:.0f}x smaller than the two-copy model"
+    )
 
     r32, _ = results["demo_float32"]
     rt4, _ = results["demo_turbo4"]
-    print(f"\nrecall cost of dropping the full-precision copy: "
-          f"{(r32 - rt4) * 100:.2f} recall points on this dataset")
-    print("if that loss is acceptable for your app -> turbo4 gives you ~9x storage back.")
+    print(
+        f"\nrecall cost of dropping the full-precision copy: "
+        f"{(r32 - rt4) * 100:.2f} recall points on this dataset"
+    )
+    print(
+        "if that loss is acceptable for your app -> turbo4 gives you ~9x storage back."
+    )
     print("if you need max recall -> keep float32 + TurboQuant *quantization* instead.")
     print("\ncaveat: random gaussian vectors are the WORST case for any quantizer.")
     print("real embedding models produce structured vectors, expect a smaller recall")

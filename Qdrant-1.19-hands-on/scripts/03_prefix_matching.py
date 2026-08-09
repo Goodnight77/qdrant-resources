@@ -15,9 +15,8 @@ This script:
   3. runs prefix filters and prints the matches
 """
 
-from qdrant_client import models
-
 from common import get_client, make_vectors
+from qdrant_client import models
 
 NAME = "demo_prefix"
 DIM_SMALL = 128
@@ -44,7 +43,9 @@ def main():
 
     client.create_collection(
         collection_name=NAME,
-        vectors_config=models.VectorParams(size=DIM_SMALL, distance=models.Distance.COSINE),
+        vectors_config=models.VectorParams(
+            size=DIM_SMALL, distance=models.Distance.COSINE
+        ),
     )
 
     # keyword index WITH prefix support (new in 1.19)
@@ -65,7 +66,11 @@ def main():
         payload=[{"url": u} for u in URLS],
     )
 
-    for prefix in ["https://qdrant.", "s3://prod-bucket/tenant-a/", "https://github.com/"]:
+    for prefix in [
+        "https://qdrant.",
+        "s3://prod-bucket/tenant-a/",
+        "https://github.com/",
+    ]:
         points, _ = client.scroll(
             collection_name=NAME,
             scroll_filter=models.Filter(

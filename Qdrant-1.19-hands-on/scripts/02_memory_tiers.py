@@ -20,9 +20,8 @@ This script builds a collection where every component gets an explicit tier:
 Then it prints the applied config back from the server so you can verify.
 """
 
+from common import DIM, get_client, make_vectors
 from qdrant_client import models
-
-from common import get_client, make_vectors, DIM
 
 NAME = "demo_memory_tiers"
 
@@ -38,19 +37,19 @@ def main():
         vectors_config=models.VectorParams(
             size=DIM,
             distance=models.Distance.COSINE,
-            memory=models.Memory.CACHED,          # original vectors: warm disk cache
+            memory=models.Memory.CACHED,  # original vectors: warm disk cache
         ),
         hnsw_config=models.HnswConfigDiff(
-            memory=models.Memory.COLD,            # graph links: lazy-load from disk
+            memory=models.Memory.COLD,  # graph links: lazy-load from disk
         ),
         quantization_config=models.ScalarQuantization(
             scalar=models.ScalarQuantizationConfig(
                 type=models.ScalarType.INT8,
-                memory=models.Memory.PINNED,      # compressed copy: locked in RAM
+                memory=models.Memory.PINNED,  # compressed copy: locked in RAM
             ),
         ),
         payload=models.PayloadStorageParams(
-            memory=models.Memory.CACHED,          # payload JSON: warm disk cache
+            memory=models.Memory.CACHED,  # payload JSON: warm disk cache
         ),
     )
 
@@ -71,7 +70,9 @@ def main():
     print(f"  dense vectors  memory : {cfg.params.vectors.memory}")
     print(f"  hnsw index     memory : {cfg.hnsw_config.memory}")
     print(f"  quantized vecs memory : {cfg.quantization_config.scalar.memory}")
-    print(f"  payload        memory : {cfg.params.payload.memory if cfg.params.payload else 'default (cold)'}")
+    print(
+        f"  payload        memory : {cfg.params.payload.memory if cfg.params.payload else 'default (cold)'}"
+    )
 
     print("""
 why this particular combo works for a disk-first setup:

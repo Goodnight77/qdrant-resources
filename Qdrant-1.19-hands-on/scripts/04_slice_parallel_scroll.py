@@ -23,9 +23,8 @@ This script proves both properties:
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-from qdrant_client import models
-
 from common import get_client, make_vectors
+from qdrant_client import models
 
 NAME = "demo_slices"
 DIM_SMALL = 128
@@ -65,7 +64,9 @@ def main():
         client.delete_collection(NAME)
     client.create_collection(
         collection_name=NAME,
-        vectors_config=models.VectorParams(size=DIM_SMALL, distance=models.Distance.COSINE),
+        vectors_config=models.VectorParams(
+            size=DIM_SMALL, distance=models.Distance.COSINE
+        ),
     )
     client.upload_collection(
         collection_name=NAME,
@@ -110,7 +111,11 @@ def scroll_slice_with_total(slice_index: int, total: int) -> set:
         points, offset = client.scroll(
             collection_name=NAME,
             scroll_filter=models.Filter(
-                must=[models.SliceCondition(slice=models.Slice(index=slice_index, total=total))]
+                must=[
+                    models.SliceCondition(
+                        slice=models.Slice(index=slice_index, total=total)
+                    )
+                ]
             ),
             limit=500,
             offset=offset,
