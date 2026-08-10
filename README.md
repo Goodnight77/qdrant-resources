@@ -1,22 +1,28 @@
 <div align="center">
-<img src="assets/qdrant_logo.svg" alt="Qdrant Resources" width="175px">
+<img src="assets/qdrant_logo.svg" alt="Awesome Qdrant Resources" width="175px">
 
-<h1>Qdrant Resources</h1>
+<h1>Awesome Qdrant Resources</h1>
 
 <p>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
-  <a href="#"><img src="https://img.shields.io/github/languages/top/Goodnight77/qdrant-resources" alt="Language"></a>
+  <img src="https://img.shields.io/badge/community-curated-DC244C" alt="Community curated">
+  <a href="https://awesome.re"><img src="https://awesome.re/badge.svg" alt="Awesome"></a>
   <a href="#"><img src="https://img.shields.io/github/last-commit/Goodnight77/qdrant-resources" alt="GitHub last commit"></a>
   <a href="https://discord.gg/qdrant"><img src="https://img.shields.io/badge/Discord-Qdrant%20Community-blueviolet" alt="Discord"></a>
   <a href="https://twitter.com/qdrant_engine"><img src="https://img.shields.io/badge/Twitter-@qdrant_engine-blue" alt="Twitter"></a>
 </p>
 
 <p>
-    ✨ A curated repository of tutorials, demos, and resources for Qdrant vector database applications in the AI ecosystem. ✨
+    <strong>✨ A community-curated collection of tutorials, projects, integrations, benchmarks, articles, and practical resources for building with Qdrant.</strong>
+</p>
+
+<p>
+    <strong>Unofficial and community-maintained, not affiliated with Qdrant.</strong>
 </p>
 
 <div align="center">
   <h3>
+    <a href="#about-this-collection">About</a> |
     <a href="#getting-started">Getting Started</a> |
     <a href="#official-qdrant-links">Official Qdrant Links</a> |
     <a href="#tutorials">Tutorials</a> |
@@ -29,7 +35,11 @@
 
 </div>
 
-**Unofficial | Community-maintained resources (not affiliated with Qdrant).**
+## About This Collection
+
+Awesome Qdrant Resources brings together practical learning materials for Qdrant—from foundational tutorials to hybrid search, quantization, embeddings, integrations, scaling, and production operations.
+
+Whether you're exploring vector search for the first time or improving an existing Qdrant deployment, this collection is designed to help you find useful, working examples quickly.
 
 
 ## Getting Started
@@ -114,7 +124,7 @@ Agent skills for Qdrant vector search: scaling, performance optimization, search
 
 ## Contributing
 
-We welcome contributions to Qdrant Resources! 🎉 
+We welcome contributions to Awesome Qdrant Resources! 🎉
 
 We're passionate about contributing to the community and sharing knowledge with developers exploring vector databases and Qdrant.
 
@@ -124,4 +134,4 @@ Please check our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-**Built with ❤️ for the Qdrant community**
+**Awesome Qdrant Resources — built with ❤️ by and for the Qdrant community.**
