@@ -26,3 +26,5 @@ A collection of articles covering Qdrant vector database, RAG systems, and integ
 12. [TurboQuant & Qdrant](https://mohamedarbi.xyz/posts/turboquant-qdrant)
     ↳ Try it: [TurboQuant/](TurboQuant/)
 13. [A Foundational Guide to Neural Search and Relevance Feedback](https://mohamedarbi.xyz/posts/foundational-guide-neural-search-relevance-feedback)
+14. [Qdrant 1.19: Turbo4 Datatype & Memory Tiers](https://mohamedarbi.xyz/posts/qdrant-119)
+    ↳ Try it: [Qdrant-1.19-hands-on/](Qdrant-1.19-hands-on/)

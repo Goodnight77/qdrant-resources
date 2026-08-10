@@ -1,7 +1,10 @@
 .venv
 .env
+.idea/
+.ruff_cache/
 *qdrant_db/
 *db/
+Qdrant-1.19-hands-on/qdrant-bin/
 notes.md
 test/
 others/

@@ -36,9 +36,9 @@ Tutorials teach specific Qdrant concepts or features. They can be:
 1. **Location**: Place tutorials in the appropriate existing folder or create a new one if needed:
    - `Qdrant-101/` - Basic Qdrant concepts and getting started
    - `RAG/` - Retrieval Augmented Generation examples
-   - `quantization/` - Vector quantization techniques
+   - `Quantization-FaceOff/` - Vector quantization techniques and benchmarks
    - `Agents/` - Agent-based implementations
-   - `image-recommendation/` - Image recommendation systems
+   - For other topics, create a clearly named tutorial folder at the repository root
 
 2. **Format**: Choose the format that best suits your tutorial (Jupyter notebooks are preferred for their interactive nature)
 
@@ -82,11 +82,11 @@ Brief description of what this tutorial covers
 ### Example Tutorial Folder with Guides
 
 ```markdown
-image-recommendation/
-├── image_rec_qdrant.ipynb    # Main tutorial notebook
-├── launch.py          # Launch script
-├── requirements.txt            # Dependencies
-└── README.md                   # Overview and usage guide
+tutorial-name/
+├── tutorial.ipynb       # Main tutorial notebook
+├── README.md            # Overview and usage guide
+├── requirements.txt     # Dependencies
+└── setup_guide.md       # Optional setup or configuration guide
 ```
 
 ## Creating New Projects
@@ -130,7 +130,7 @@ Our current repository structure:
 
 - `Agents/` - LangGraph and agent-based implementations
 - `Qdrant-101/` - Foundational Qdrant tutorials
-- `quantization/` - Vector quantization tutorials
+- `Quantization-FaceOff/` - Vector quantization tutorials and benchmarks
 - `RAG/` - Retrieval Augmented Generation examples (LangChain, LlamaIndex)
 
 If your contribution doesn't fit into an existing folder, feel free to create a new one with a descriptive name.

@@ -3,7 +3,9 @@
 **[Read the companion article here](https://medium.com/@mohammedarbinsibi/from-fragile-to-agentic-rag-with-smolagents-chonkie-and-qdrant-d11197c95ab8)**
 
 <!-- ![Chonkie Logo](assets/chonkie.png) -->
-![handshake](../assets/handshake.png)
+<p align="center">
+  <img src="../assets/handshake.png" alt="Chonkie and Qdrant handshake">
+</p>
 
 ## What is Chonkie?
 **Chonkie** is a Python SDK that provides a pipeline for chunking text, embedding those chunks, and seamlessly integrating with vector stores like Qdrant.
@@ -32,14 +34,14 @@ pip install chonkie[qdrant]
 
 ## Contents
 
-- **`Chonkie_Qdrant_Handshake.ipynb`** - Complete integration tutorial showing:
+- **[`Chonkie_Qdrant_Handshake_READY.ipynb`](Chonkie_Qdrant_Handshake_READY.ipynb)** - Complete integration tutorial showing:
   - Chunking strategy performance comparison
   - Qdrant vector store integration
   - Real-world text processing examples
 
 - **Similar tutorial from the Chonkie cookbook** - [Chonkie_Qdrant_Handshake_for_TinyStories.ipynb](https://github.com/chonkie-inc/cookbook/blob/main/tutorials/Chonkie_Qdrant_Handshake_for_TinyStories.ipynb) that I made
   
-- **`tinystories.txt`** - Sample dataset containing 27k+ Tiny Stories for testing chunking strategies (also available for download within the notebook)
+- The notebook downloads the TinyStories sample dataset used to test the chunking strategies.
 
 ## Tutorial Highlights
 
