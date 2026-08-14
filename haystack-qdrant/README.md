@@ -27,3 +27,10 @@
 1. Open the notebook in Google Colab.
 2. Add `QDRANT_URL` and `QDRANT_API_KEY` to Colab secrets.
 3. Run cells top to bottom. The install cell pulls `haystack-ai`, `qdrant-haystack`, `sentence-transformers`, `datasets`, and `fastembed-haystack`.
+
+## References
+
+- [Qdrant's Haystack integration guide](https://qdrant.tech/documentation/frameworks/haystack/)
+- [Haystack QdrantDocumentStore documentation](https://docs.haystack.deepset.ai/docs/qdrant-document-store)
+- [Haystack QdrantEmbeddingRetriever documentation](https://docs.haystack.deepset.ai/docs/qdrantembeddingretriever)
+- [Qdrant integration source for Haystack](https://github.com/deepset-ai/haystack-core-integrations/tree/main/integrations/qdrant)

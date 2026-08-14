@@ -4,7 +4,7 @@
 <h1>Awesome Qdrant Resources</h1>
 
 <p>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/community-curated-DC244C" alt="Community curated">
   <a href="https://awesome.re"><img src="https://awesome.re/badge.svg" alt="Awesome"></a>
   <a href="#"><img src="https://img.shields.io/github/last-commit/Goodnight77/qdrant-resources" alt="GitHub last commit"></a>
@@ -46,18 +46,19 @@ Whether you're exploring vector search for the first time or improving an existi
 
 New to Qdrant? Here's how to get started:
 
-1. **First time with Qdrant?** Start with our [Qdrant 101 tutorial](Qdrant-101/qdrant_101_tutorial.ipynb)**✅ Ready!**
+1. **First time with Qdrant?** Start with our [Qdrant 101 tutorial](Qdrant-101/qdrant_101_tutorial.ipynb) - **✅ Ready!**
 2. **Text chunking with Qdrant?** Try the [Chonkie Integration](chonkie/Chonkie_Qdrant_Handshake_READY.ipynb) - **✅ Ready!**
 3. **Multimodal Search?** Check out [Gemini Embeddings](Gemini-embeddings/) - **✅ Ready!**
 4. **Efficient Embeddings?** Learn about [Matryoshka MRL](Matryoshka-MRL/) - **✅ Ready!**
 5. **Vector Compression?** Read about [Google TurboQuant](TurboQuant/) - **✅ Ready!**
 6. **Quantization tradeoffs?** Compare them in the [Quantization Face-Off](Quantization-FaceOff/) - **✅ Ready!**
+7. **Exploring Qdrant 1.19?** Run the [Qdrant 1.19 hands-on demos](Qdrant-1.19-hands-on/) - **✅ Ready!**
 
 <hr>
 
 ## Official Qdrant Links
 
-- [Qdrant Homepage](http://qdrant.tech/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
+- [Qdrant Homepage](https://qdrant.tech/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Qdrant Documentation](https://qdrant.tech/documentation/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Qdrant Cloud Sign Up](https://cloud.qdrant.io/signup?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
 - [Subscribe to the Qdrant Newsletter](https://qdrant.tech/subscribe/?utm_medium=referral&utm_source=stars&utm_campaign=devrel&utm_content=mohammed-arbi)
@@ -72,9 +73,10 @@ New to Qdrant? Here's how to get started:
 - **[Gemini Embeddings](Gemini-embeddings/)** - Multimodal Semantic Search with Gemini 2
 - **[Matryoshka MRL](Matryoshka-MRL/)** - Matryoshka Representation Learning (MRL) concepts
 - **[TurboQuant](TurboQuant/)** - High-recall vector quantization and memory-efficient search
+- **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** - Runnable demos for Turbo4, memory tiers, prefix matching, and parallel scrolling
 
 ### 🚧 **Coming Soon**
-- **[RAG Applications](RAG/)** - LangChain & LlamaIndex tutorials (in development)
+- **[RAG Applications](RAG/)** - RAG resources and the practical [Just-RAG implementation](https://github.com/Goodnight77/Just-RAG)
 - **Agent Workflows** - LangGraph implementations (in development)
 - **Image Recommendations** - Computer vision search systems (planned)
 - **Embeddings** - Matryoshka embeddings and advanced strategies (in development)
@@ -88,6 +90,7 @@ New to Qdrant? Here's how to get started:
 | --- | --- | --- | --- |
 | ✅ | **[Quantization Face-Off](Quantization-FaceOff/)** | Head-to-head benchmark of Qdrant quantization (f32 / SQ / PQ / BQ) on 1M-scale text embeddings | Recall vs latency vs RAM, rescoring sweeps, cost analysis, W&B telemetry |
 | ✅ | **[Chonkie Integration](chonkie/)** | Text chunking with seamless Qdrant integration | Multiple chunking strategies, performance comparison |
+| ✅ | **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** | Runnable examples for the Qdrant 1.19 release | Turbo4, memory tiers, prefix filters, parallel scrolling |
 | 🚧 | **Image Recommendations** | Image similarity search systems (in development) | Computer vision, embeddings, similarity search |
 | 🚧 | **Agent Workflows** | AI agent implementations (planned) | LangGraph, agentic RAG, vector memory |
 
