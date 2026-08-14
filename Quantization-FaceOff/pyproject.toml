@@ -7,7 +7,7 @@ dependencies = [
     "matplotlib>=3.11.0",
     "numpy>=2.5.0",
     "python-dotenv>=1.2.2",
-    "qdrant-client>=1.18.0",
+    "qdrant-client>=1.19.0",
     "wandb>=0.28.0",
 ]
 
