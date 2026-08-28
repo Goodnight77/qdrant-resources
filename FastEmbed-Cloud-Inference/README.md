@@ -39,11 +39,13 @@ synthetic or repeated text. Model: `BAAI/bge-small-en-v1.5`, on a single
 shared CPU core, no Docker, no external network calls beyond the one-time
 model and dataset download.
 
-| Metric | Result |
-|---|---|
-| Corpus indexing throughput (3,633 real docs) | 1.24 docs/sec |
-| Real query latency (323 distinct queries), p50 / p95 | 80.3 ms / 128.0 ms |
-| Retrieval quality: hit-rate@10 / MRR@10 | 70.3% / 0.529 |
+| Metric | CPU (1 core) | Modal T4 GPU |
+|---|---|---|
+| Corpus indexing throughput (3,633 real docs) | 1.24 docs/sec | 129.1 docs/sec (**104x**) |
+| Real query latency (323 distinct queries), p50 / p95 | 80.3 ms / 128.0 ms | 8.8 ms / 9.4 ms |
+| Retrieval quality: hit-rate@10 / MRR@10 | 70.3% / 0.529 | n/a (embedding-only run, no retrieval pass) |
+
+![CPU vs GPU: indexing throughput and query latency](../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png)
 
 **The headline finding**: document length dominates embedding throughput far
 more than batch size. A transformer's per-document cost scales with sequence
@@ -72,7 +74,12 @@ path, and document length matters far more than batch size. See
 `benchmark_real_data.py` / `results_real_data.json` for the full run.
 
 A GPU counterpart (`gpu_benchmark_modal.py`, same corpus, same model, on a
-Modal T4) is included but not yet run - see that file for status.
+Modal T4 via `sentence-transformers`/CUDA rather than FastEmbed's ONNX
+runtime - see that file's docstring for why) confirms the CPU numbers above
+are compute-bound, not an artifact of the single-core sandbox: **104x**
+indexing throughput and roughly **9-14x** lower query latency on GPU. See
+`results_real_data_gpu.json` for the raw run and `plot_cpu_vs_gpu.py` for how
+the chart above was generated.
 
 ## The alternative: embed next to (or inside) Qdrant
 
@@ -246,8 +253,14 @@ Cloud cluster (pattern C) - never to an unrelated third-party API.
 - `results_real_data.json` - raw output of the last `benchmark_real_data.py`
   run.
 - `gpu_benchmark_modal.py` - GPU counterpart of the same real-data
-  benchmark, run detached on a Modal T4. Not yet executed; see the file for
-  how to launch and fetch results.
+  benchmark, run detached on a Modal T4. See the file for how to launch and
+  fetch results.
+- `results_real_data_gpu.json` - raw output of the last `gpu_benchmark_modal.py`
+  run.
+- `plot_cpu_vs_gpu.py` - renders
+  `../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png` from the two
+  results files above. Requires `matplotlib`.
 - `requirements.txt` - Python dependencies for `ingest_and_query.py`.
-  `benchmark_real_data.py` additionally needs `pip install datasets`, and
-  `gpu_benchmark_modal.py` needs `pip install modal`.
+  `benchmark_real_data.py` additionally needs `pip install datasets`,
+  `gpu_benchmark_modal.py` needs `pip install modal`, and
+  `plot_cpu_vs_gpu.py` needs `pip install matplotlib`.

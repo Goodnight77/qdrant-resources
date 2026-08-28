@@ -1,0 +1,16 @@
+{
+  "runtime": "sentence-transformers (torch/CUDA), T4 GPU",
+  "model": "BAAI/bge-small-en-v1.5",
+  "corpus_size": 3633,
+  "test_query_count": 323,
+  "model_load_seconds": 6.003635619000001,
+  "corpus_index_seconds": 28.150228600000002,
+  "corpus_index_docs_per_sec": 129.0575665165291,
+  "real_query_latency_ms": {
+    "mean": 9.33644666563452,
+    "p50": 8.849761000000456,
+    "p95": 9.41941500000354,
+    "min": 8.456902999995464,
+    "max": 139.13579000000453
+  }
+}
