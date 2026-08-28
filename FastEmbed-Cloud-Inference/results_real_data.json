@@ -1,0 +1,24 @@
+{
+  "dataset": "BeIR/nfcorpus",
+  "corpus_size": 3633,
+  "test_query_count": 323,
+  "corpus_char_len": {
+    "min": 123,
+    "max": 10090,
+    "mean": 1590.783925130746
+  },
+  "corpus_index_seconds": 2920.6288631380003,
+  "corpus_index_docs_per_sec": 1.2439101886080142,
+  "real_query_latency_ms": {
+    "mean": 91.53054042414678,
+    "p50": 80.25364000013724,
+    "p95": 127.98214800022834,
+    "min": 56.78846299997531,
+    "max": 163.5610460002681
+  },
+  "retrieval_quality": {
+    "mrr_at_10": 0.5285112290530247,
+    "note": "hit_rate@10 = fraction of queries with >=1 known-relevant document in the top 10 (a lenient hit-rate, NOT the standard Recall@10 which averages the fraction of ALL relevant docs retrieved per query). mrr_at_10 = mean reciprocal rank of the first relevant hit (0 if none in top 10). Judged against BeIR/nfcorpus-qrels (test split, sparse human judgments \u2014 not every relevant doc is necessarily labeled).",
+    "hit_rate_at_10": 0.7027863777089783
+  }
+}
