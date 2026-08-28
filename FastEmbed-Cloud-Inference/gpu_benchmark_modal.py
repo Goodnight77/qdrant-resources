@@ -42,6 +42,7 @@ Cost note: allocates a T4 GPU for the duration of the run (a few minutes
 including model download) - expect well under $1 on Modal's per-second T4
 pricing, but confirm current pricing before running if that matters to you.
 """
+
 import json
 import statistics
 import time
@@ -116,7 +117,9 @@ def run_benchmark() -> dict:
     qclient = QdrantClient(":memory:")
     qclient.create_collection(
         collection_name="nfcorpus",
-        vectors_config=models.VectorParams(size=corpus_vectors.shape[1], distance=models.Distance.COSINE),
+        vectors_config=models.VectorParams(
+            size=corpus_vectors.shape[1], distance=models.Distance.COSINE
+        ),
     )
     qclient.upload_points(
         collection_name="nfcorpus",
@@ -136,7 +139,9 @@ def run_benchmark() -> dict:
         )
         retrieved_doc_ids = [corpus_ids[p.id] for p in response.points]
         relevant = relevant_by_query[qid]
-        hit_ranks = [rank for rank, d in enumerate(retrieved_doc_ids, start=1) if d in relevant]
+        hit_ranks = [
+            rank for rank, d in enumerate(retrieved_doc_ids, start=1) if d in relevant
+        ]
         recall_hits.append(1 if hit_ranks else 0)
         reciprocal_ranks.append(1.0 / hit_ranks[0] if hit_ranks else 0.0)
 
@@ -175,7 +180,7 @@ def main():
     call = run_benchmark.spawn()
     print(f"Spawned detached run. Function call id: {call.object_id}")
     print("This keeps running on Modal's infrastructure independent of this process.")
-    print(f"Fetch results once it's done with:")
+    print("Fetch results once it's done with:")
     print(f"  modal run gpu_benchmark_modal.py::fetch --call-id {call.object_id}")
     with open("call_id.txt", "w") as f:
         f.write(call.object_id)

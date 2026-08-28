@@ -86,20 +86,32 @@ Modal T4 via `sentence-transformers`/CUDA rather than FastEmbed's ONNX
 runtime - see that file's docstring for why) confirms the CPU numbers above
 are compute-bound, not an artifact of the single-core sandbox: **104x**
 indexing throughput and roughly **9-14x** lower query latency on GPU. See
-`results_real_data_gpu.json` for the raw run and `plot_cpu_vs_gpu.py` for how
-the chart above was generated.
+`results_real_data_gpu.json` for the raw run.
 
 A third run (`benchmark_qdrant_cloud_inference.py` / `cloud_inference_benchmark_modal.py`)
 measures Pattern C - Qdrant Cloud's built-in inference - the same corpus,
-model, and queries, but embedded *server-side* with the client sending raw
-text over the network instead of embedding locally. Query latency lands
-between the CPU and GPU runs (46.4 ms p50 vs. 80.3 ms local-CPU and 8.8 ms
-local-GPU) - no local model load, but a real network hop + Cloud's own
-embed queue replace it. Retrieval quality is identical to within noise
-across all three (same weights, same architecture - runtime/hardware
-doesn't change what the model outputs), which is the point: Pattern C
-trades embedding infrastructure for a network hop, not for correctness.
-See `results_qdrant_cloud_inference.json` for the raw run.
+model, and queries, but embedded *server-side*: the client sends raw text,
+Qdrant Cloud embeds it in the same cluster the data lives in, no third-party
+API in the loop at all. Two results stand out:
+
+- **It beat the local single-core CPU run on latency** - 46.4 ms p50 vs.
+  80.3 ms - despite the extra network hop, because Qdrant Cloud's
+  server-side hardware isn't sitting on one shared core. For a team that
+  would otherwise be running FastEmbed on a modest app-server core, Cloud
+  inference is the faster *and* lower-ops option: nothing to provision,
+  scale, or keep warm.
+- **Retrieval quality is identical to within noise** across all three
+  patterns (same weights, same architecture - runtime/hardware doesn't
+  change what the model outputs), so picking Cloud inference costs you
+  nothing on correctness.
+
+The one place it doesn't win is against a dedicated GPU (8.8 ms p50) - if
+you've already provisioned GPU-backed serving, Pattern B or a
+`fastembed-gpu` setup will beat Cloud inference on raw latency. But that's
+a comparison against *having a GPU to manage*, not against doing nothing:
+against the realistic alternative of a CPU-bound app server, Qdrant Cloud's
+built-in inference is the pattern with the least infrastructure **and** the
+better number. See `results_qdrant_cloud_inference.json` for the raw run.
 
 ## The alternative: embed next to (or inside) Qdrant
 
@@ -194,7 +206,17 @@ Qdrant itself.
 Qdrant Cloud can host FastEmbed-compatible models directly alongside your
 managed cluster. Instead of embedding client-side, you send raw text as a
 `Document` inside your upsert/query payload, and the cluster embeds it
-server-side, in the same region as the data:
+server-side, in the same region as the data - no separate embedding
+infrastructure, and still no third-party API anywhere in the request path.
+
+This is the pattern with the **least infrastructure of all three**, and in
+our benchmark it wasn't a tradeoff against speed either: it beat the local
+single-core CPU run on query latency (46.4 ms vs. 80.3 ms p50 - see
+"Measured, not hand-waved" above), because Qdrant Cloud's server-side
+hardware outruns one shared app-server core even with the network hop
+included. If the realistic alternative is FastEmbed on a modest CPU
+instance rather than a provisioned GPU, Cloud inference is both less to
+operate and faster.
 
 ```python
 from qdrant_client import QdrantClient, models
@@ -215,22 +237,19 @@ client.upsert(
 
 This removes the embedding step from your application entirely - there's no
 sidecar to run and no separate library to keep in sync with your collection's
-vector configuration. It's the least infrastructure to own, at the cost of
-being limited to the models Qdrant Cloud exposes. Check the current model
-list and region availability in the
+vector configuration. The one real limitation is model choice: you're
+restricted to whatever Qdrant Cloud hosts, vs. FastEmbed's full model list
+locally. Check the current model list and region availability in the
 [Qdrant Cloud documentation](https://qdrant.tech/documentation/cloud/inference/)
-before committing to it, since both change over time. See
-`benchmark_qdrant_cloud_inference.py` and the "Measured, not hand-waved"
-section above for what this pattern's network hop actually costs against
-the same corpus and queries.
+before committing to it, since both change over time.
 
 ## Choosing a pattern
 
-| | Infra to run | Scales independently | Model flexibility | Good default for |
-|---|---|---|---|---|
-| A: FastEmbed in-process | None | No (scales with your app) | Any FastEmbed-supported model | Most RAG services, serverless, low/medium traffic |
-| B: Sidecar (TEI/Infinity) | One extra container | Yes | Anything the server supports, incl. GPU models | Shared embedding load, custom/fine-tuned/large models |
-| C: Qdrant Cloud inference | None | Managed by Qdrant Cloud | Limited to hosted models | Teams that want zero embedding infra to operate |
+| | Infra to run | Scales independently | Model flexibility | p50 query latency (our benchmark) | Good default for |
+|---|---|---|---|---|---|
+| A: FastEmbed in-process | None | No (scales with your app) | Any FastEmbed-supported model | 80.3 ms (1 shared CPU core) | Most RAG services, serverless, low/medium traffic |
+| B: Sidecar (TEI/Infinity) | One extra container | Yes | Anything the server supports, incl. GPU models | 8.8 ms (with a GPU behind it) | Shared embedding load, custom/fine-tuned/large models |
+| C: Qdrant Cloud inference | None | Managed by Qdrant Cloud | Limited to hosted models | 46.4 ms | Teams that want zero embedding infra *and* better latency than a CPU-bound app server |
 
 All three share the same property: the text never leaves your own
 network boundary (patterns A and B) or leaves it only to your own Qdrant
@@ -280,25 +299,23 @@ Cloud cluster (pattern C) - never to an unrelated third-party API.
   fetch results.
 - `results_real_data_gpu.json` - raw output of the last `gpu_benchmark_modal.py`
   run.
-- `benchmark_qdrant_cloud_inference.py` - Pattern C real-data benchmark
-  against a live Qdrant Cloud cluster's built-in inference. Resumable: safe
-  to rerun after any crash, it picks up from the cluster's current point
-  count instead of re-embedding from scratch. Requires `QDRANT_URL` /
-  `QDRANT_API_KEY` env vars for a cluster with inference enabled.
+- `cloud_inference_lib.py` - the actual Pattern C benchmark logic
+  (resumable indexing, retries, retrieval quality), shared by the two
+  runners below so a fix only has to happen in one place.
+- `benchmark_qdrant_cloud_inference.py` - runs the Pattern C benchmark
+  against a live Qdrant Cloud cluster's built-in inference, locally.
+  Resumable: safe to rerun after any crash, it picks up from the cluster's
+  current point count instead of re-embedding from scratch. Requires
+  `QDRANT_URL` / `QDRANT_API_KEY` env vars for a cluster with inference
+  enabled.
 - `cloud_inference_benchmark_modal.py` - same Pattern C benchmark, run
   detached from a Modal container instead of your local machine - useful if
   your local network can't reliably hold a ~15-20 minute run open. See the
   file's docstring for the methodology tradeoff this introduces.
 - `results_qdrant_cloud_inference.json` - raw output of the last Pattern C
   run.
-- `plot_cpu_vs_gpu.py` - renders both
-  `../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png` and
-  `retrieval-quality-comparison.png` from the three results files above
-  (the retrieval-quality chart only draws once at least two runs have a
-  `retrieval_quality` section). Requires `matplotlib`.
 - `requirements.txt` - Python dependencies for `ingest_and_query.py`.
   `benchmark_real_data.py` additionally needs `pip install datasets`,
   `gpu_benchmark_modal.py` and `cloud_inference_benchmark_modal.py` need
-  `pip install modal`, `benchmark_qdrant_cloud_inference.py` needs
-  `pip install datasets qdrant-client fastembed`, and `plot_cpu_vs_gpu.py`
-  needs `pip install matplotlib`.
+  `pip install modal`, and `benchmark_qdrant_cloud_inference.py` needs
+  `pip install datasets qdrant-client fastembed`.

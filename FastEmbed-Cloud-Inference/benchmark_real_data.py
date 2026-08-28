@@ -14,6 +14,7 @@ Run:
     pip install -r requirements.txt datasets
     python benchmark_real_data.py
 """
+
 import json
 import statistics
 import time
@@ -44,7 +45,8 @@ results = {
     "corpus_size": len(corpus_texts),
     "test_query_count": len(test_query_ids),
     "corpus_char_len": {
-        "min": min(doc_lens), "max": max(doc_lens),
+        "min": min(doc_lens),
+        "max": max(doc_lens),
         "mean": statistics.mean(doc_lens),
     },
 }
@@ -54,13 +56,15 @@ client = QdrantClient(":memory:")
 vector_size = client.get_embedding_size(MODEL_NAME)
 client.create_collection(
     collection_name="nfcorpus",
-    vectors_config=models.VectorParams(size=vector_size, distance=models.Distance.COSINE),
+    vectors_config=models.VectorParams(
+        size=vector_size, distance=models.Distance.COSINE
+    ),
 )
 
 BATCH = 64
 t0 = time.perf_counter()
 for i in range(0, len(corpus_texts), BATCH):
-    chunk = corpus_texts[i:i + BATCH]
+    chunk = corpus_texts[i : i + BATCH]
     client.upsert(
         collection_name="nfcorpus",
         points=[
@@ -96,7 +100,9 @@ for qid in test_query_ids:
 
     retrieved_doc_ids = [id_to_doc_id[p.id] for p in response.points]
     relevant = relevant_by_query[qid]
-    hit_ranks = [rank for rank, d in enumerate(retrieved_doc_ids, start=1) if d in relevant]
+    hit_ranks = [
+        rank for rank, d in enumerate(retrieved_doc_ids, start=1) if d in relevant
+    ]
     recall_hits.append(1 if hit_ranks else 0)
     reciprocal_ranks.append(1.0 / hit_ranks[0] if hit_ranks else 0.0)
 
