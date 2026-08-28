@@ -12,10 +12,16 @@ CPU-runtime-vs-GPU-runtime comparison for the same architecture - just be
 aware the runtime differs, not only the hardware, when you read the numbers
 side by side with benchmark_real_data.py's.
 
-This measures embedding throughput/latency only (no Qdrant round trip) -
-that isolates the actual bottleneck the CPU run identified (embedding
-compute), since local Qdrant search overhead over ~3.6K vectors was
-negligible next to embedding time in the CPU run.
+Latency/throughput above measures embedding compute only (no Qdrant round
+trip in the timed section) - that isolates the actual bottleneck the CPU run
+identified (embedding compute), since local Qdrant search overhead over
+~3.6K vectors was negligible next to embedding time in the CPU run.
+
+Retrieval quality (hit-rate@10, MRR@10) is computed separately, off the
+timed critical path: the GPU-encoded corpus/query vectors are indexed into
+an in-memory Qdrant and searched, same methodology as
+benchmark_real_data.py, so hit_rate_at_10/mrr_at_10 here are directly
+comparable to results_real_data.json's.
 
 Runs detached: launching it hands the job to Modal's infrastructure and
 returns immediately, so it keeps running even if your terminal, laptop, or
@@ -45,15 +51,19 @@ import modal
 app = modal.App("fastembed-gpu-benchmark")
 
 image = modal.Image.debian_slim(python_version="3.11").pip_install(
-    "torch", "sentence-transformers", "datasets", "huggingface_hub"
+    "torch", "sentence-transformers", "datasets", "huggingface_hub", "qdrant-client"
 )
 
 MODEL_NAME = "BAAI/bge-small-en-v1.5"
+TOP_K = 10
 
 
 @app.function(image=image, gpu="T4", timeout=900)
 def run_benchmark() -> dict:
+    from collections import defaultdict
+
     from datasets import load_dataset
+    from qdrant_client import QdrantClient, models
     from sentence_transformers import SentenceTransformer
 
     t0 = time.perf_counter()
@@ -65,7 +75,12 @@ def run_benchmark() -> dict:
     qrels = load_dataset("BeIR/nfcorpus-qrels", split="test")
 
     query_text_by_id = {q["_id"]: q["text"] for q in queries}
-    test_query_ids = sorted({row["query-id"] for row in qrels})
+    relevant_by_query = defaultdict(set)
+    for row in qrels:
+        relevant_by_query[row["query-id"]].add(row["corpus-id"])
+    test_query_ids = list(relevant_by_query.keys())
+
+    corpus_ids = [row["_id"] for row in corpus]
     corpus_texts = [f"{row['title']} {row['text']}".strip() for row in corpus]
 
     # warm-up (first CUDA call pays kernel/context init cost)
@@ -74,20 +89,56 @@ def run_benchmark() -> dict:
     # 1. Full real corpus, batched - the number that mirrors
     #    corpus_index_docs_per_sec in results_real_data.json
     t0 = time.perf_counter()
-    model.encode(corpus_texts, batch_size=64, show_progress_bar=False)
+    corpus_vectors = model.encode(corpus_texts, batch_size=64, show_progress_bar=False)
     corpus_elapsed = time.perf_counter() - t0
 
     # 2. Real per-query latency, one at a time (323 distinct real queries),
-    #    mirrors real_query_latency_ms in results_real_data.json
+    #    mirrors real_query_latency_ms in results_real_data.json. Embedding
+    #    time only - the retrieval-quality pass below reuses these vectors
+    #    but isn't part of the timed latency.
     query_latencies_ms = []
+    query_vectors = {}
     for qid in test_query_ids:
         text = query_text_by_id[qid]
         t0 = time.perf_counter()
-        model.encode([text])
+        vec = model.encode([text])[0]
         query_latencies_ms.append((time.perf_counter() - t0) * 1000)
+        query_vectors[qid] = vec
 
     query_latencies_ms.sort()
     n = len(query_latencies_ms)
+
+    # 3. Retrieval quality: index the already-computed GPU embeddings into
+    #    an in-memory Qdrant and search with the already-computed query
+    #    vectors - same hit-rate@10 / MRR@10 methodology as
+    #    benchmark_real_data.py, so it's directly comparable to
+    #    results_real_data.json. Not timed - off the critical path above.
+    qclient = QdrantClient(":memory:")
+    qclient.create_collection(
+        collection_name="nfcorpus",
+        vectors_config=models.VectorParams(size=corpus_vectors.shape[1], distance=models.Distance.COSINE),
+    )
+    qclient.upload_points(
+        collection_name="nfcorpus",
+        points=[
+            models.PointStruct(id=i, vector=vec.tolist(), payload={"doc_id": doc_id})
+            for i, (doc_id, vec) in enumerate(zip(corpus_ids, corpus_vectors))
+        ],
+    )
+
+    recall_hits = []
+    reciprocal_ranks = []
+    for qid in test_query_ids:
+        response = qclient.query_points(
+            collection_name="nfcorpus",
+            query=query_vectors[qid].tolist(),
+            limit=TOP_K,
+        )
+        retrieved_doc_ids = [corpus_ids[p.id] for p in response.points]
+        relevant = relevant_by_query[qid]
+        hit_ranks = [rank for rank, d in enumerate(retrieved_doc_ids, start=1) if d in relevant]
+        recall_hits.append(1 if hit_ranks else 0)
+        reciprocal_ranks.append(1.0 / hit_ranks[0] if hit_ranks else 0.0)
 
     return {
         "runtime": "sentence-transformers (torch/CUDA), T4 GPU",
@@ -103,6 +154,18 @@ def run_benchmark() -> dict:
             "p95": query_latencies_ms[int(n * 0.95)],
             "min": query_latencies_ms[0],
             "max": query_latencies_ms[-1],
+        },
+        "retrieval_quality": {
+            "hit_rate_at_10": statistics.mean(recall_hits),
+            "mrr_at_10": statistics.mean(reciprocal_ranks),
+            "note": (
+                "Same methodology as results_real_data.json: hit_rate@10 = "
+                "fraction of queries with >=1 known-relevant doc in the top "
+                "10; mrr_at_10 = mean reciprocal rank of the first relevant "
+                "hit. Computed from the same GPU-encoded vectors used above "
+                "against an in-memory Qdrant index - not timed as part of "
+                "the latency/throughput numbers."
+            ),
         },
     }
 

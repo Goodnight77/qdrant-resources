@@ -39,13 +39,21 @@ synthetic or repeated text. Model: `BAAI/bge-small-en-v1.5`, on a single
 shared CPU core, no Docker, no external network calls beyond the one-time
 model and dataset download.
 
-| Metric | CPU (1 core) | Modal T4 GPU |
-|---|---|---|
-| Corpus indexing throughput (3,633 real docs) | 1.24 docs/sec | 129.1 docs/sec (**104x**) |
-| Real query latency (323 distinct queries), p50 / p95 | 80.3 ms / 128.0 ms | 8.8 ms / 9.4 ms |
-| Retrieval quality: hit-rate@10 / MRR@10 | 70.3% / 0.529 | n/a (embedding-only run, no retrieval pass) |
+| Metric | CPU (1 core) | Modal T4 GPU | Qdrant Cloud built-in inference |
+|---|---|---|---|
+| Corpus indexing throughput (3,633 real docs) | 1.24 docs/sec | 129.1 docs/sec (**104x**) | ~1.5 docs/sec* |
+| Real query latency (323 distinct queries), p50 / p95 | 80.3 ms / 128.0 ms | 8.8 ms / 9.4 ms | 46.4 ms / 55.1 ms |
+| Retrieval quality: hit-rate@10 / MRR@10 | 70.3% / 0.529 | 70.0% / 0.530 | 70.3% / 0.530 |
 
-![CPU vs GPU: indexing throughput and query latency](../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png)
+\* Pattern C's indexing number is not directly comparable to the other two -
+the run got interrupted and resumed several times (see
+`benchmark_qdrant_cloud_inference.py`'s resumability notes), so
+`corpus_index_docs_per_sec` only times the final segment, not one clean
+end-to-end pass. Treat it as "same order of magnitude as local CPU," not a
+precise figure - the query latency and retrieval-quality numbers are clean.
+
+![CPU vs GPU vs Qdrant Cloud: indexing throughput and query latency](../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png)
+![Retrieval quality is identical across all three, as expected - same model, same weights](../assets/cloud-embedding-qdrant/retrieval-quality-comparison.png)
 
 **The headline finding**: document length dominates embedding throughput far
 more than batch size. A transformer's per-document cost scales with sequence
@@ -80,6 +88,18 @@ are compute-bound, not an artifact of the single-core sandbox: **104x**
 indexing throughput and roughly **9-14x** lower query latency on GPU. See
 `results_real_data_gpu.json` for the raw run and `plot_cpu_vs_gpu.py` for how
 the chart above was generated.
+
+A third run (`benchmark_qdrant_cloud_inference.py` / `cloud_inference_benchmark_modal.py`)
+measures Pattern C - Qdrant Cloud's built-in inference - the same corpus,
+model, and queries, but embedded *server-side* with the client sending raw
+text over the network instead of embedding locally. Query latency lands
+between the CPU and GPU runs (46.4 ms p50 vs. 80.3 ms local-CPU and 8.8 ms
+local-GPU) - no local model load, but a real network hop + Cloud's own
+embed queue replace it. Retrieval quality is identical to within noise
+across all three (same weights, same architecture - runtime/hardware
+doesn't change what the model outputs), which is the point: Pattern C
+trades embedding infrastructure for a network hop, not for correctness.
+See `results_qdrant_cloud_inference.json` for the raw run.
 
 ## The alternative: embed next to (or inside) Qdrant
 
@@ -199,7 +219,10 @@ vector configuration. It's the least infrastructure to own, at the cost of
 being limited to the models Qdrant Cloud exposes. Check the current model
 list and region availability in the
 [Qdrant Cloud documentation](https://qdrant.tech/documentation/cloud/inference/)
-before committing to it, since both change over time.
+before committing to it, since both change over time. See
+`benchmark_qdrant_cloud_inference.py` and the "Measured, not hand-waved"
+section above for what this pattern's network hop actually costs against
+the same corpus and queries.
 
 ## Choosing a pattern
 
@@ -257,10 +280,25 @@ Cloud cluster (pattern C) - never to an unrelated third-party API.
   fetch results.
 - `results_real_data_gpu.json` - raw output of the last `gpu_benchmark_modal.py`
   run.
-- `plot_cpu_vs_gpu.py` - renders
-  `../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png` from the two
-  results files above. Requires `matplotlib`.
+- `benchmark_qdrant_cloud_inference.py` - Pattern C real-data benchmark
+  against a live Qdrant Cloud cluster's built-in inference. Resumable: safe
+  to rerun after any crash, it picks up from the cluster's current point
+  count instead of re-embedding from scratch. Requires `QDRANT_URL` /
+  `QDRANT_API_KEY` env vars for a cluster with inference enabled.
+- `cloud_inference_benchmark_modal.py` - same Pattern C benchmark, run
+  detached from a Modal container instead of your local machine - useful if
+  your local network can't reliably hold a ~15-20 minute run open. See the
+  file's docstring for the methodology tradeoff this introduces.
+- `results_qdrant_cloud_inference.json` - raw output of the last Pattern C
+  run.
+- `plot_cpu_vs_gpu.py` - renders both
+  `../assets/cloud-embedding-qdrant/cpu-vs-gpu-comparison.png` and
+  `retrieval-quality-comparison.png` from the three results files above
+  (the retrieval-quality chart only draws once at least two runs have a
+  `retrieval_quality` section). Requires `matplotlib`.
 - `requirements.txt` - Python dependencies for `ingest_and_query.py`.
   `benchmark_real_data.py` additionally needs `pip install datasets`,
-  `gpu_benchmark_modal.py` needs `pip install modal`, and
-  `plot_cpu_vs_gpu.py` needs `pip install matplotlib`.
+  `gpu_benchmark_modal.py` and `cloud_inference_benchmark_modal.py` need
+  `pip install modal`, `benchmark_qdrant_cloud_inference.py` needs
+  `pip install datasets qdrant-client fastembed`, and `plot_cpu_vs_gpu.py`
+  needs `pip install matplotlib`.

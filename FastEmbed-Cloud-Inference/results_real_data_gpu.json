@@ -3,14 +3,19 @@
   "model": "BAAI/bge-small-en-v1.5",
   "corpus_size": 3633,
   "test_query_count": 323,
-  "model_load_seconds": 6.003635619000001,
-  "corpus_index_seconds": 28.150228600000002,
-  "corpus_index_docs_per_sec": 129.0575665165291,
+  "model_load_seconds": 4.731789849999998,
+  "corpus_index_seconds": 29.200102704,
+  "corpus_index_docs_per_sec": 124.41737061090305,
   "real_query_latency_ms": {
-    "mean": 9.33644666563452,
-    "p50": 8.849761000000456,
-    "p95": 9.41941500000354,
-    "min": 8.456902999995464,
-    "max": 139.13579000000453
+    "mean": 10.49427721671811,
+    "p50": 9.701145999997607,
+    "p95": 12.034300000003384,
+    "min": 8.871407999997416,
+    "max": 127.45047499999629
+  },
+  "retrieval_quality": {
+    "hit_rate_at_10": 0.6996904024767802,
+    "mrr_at_10": 0.5299044179075139,
+    "note": "Same methodology as results_real_data.json: hit_rate@10 = fraction of queries with >=1 known-relevant doc in the top 10; mrr_at_10 = mean reciprocal rank of the first relevant hit. Computed from the same GPU-encoded vectors used above against an in-memory Qdrant index - not timed as part of the latency/throughput numbers."
   }
 }
