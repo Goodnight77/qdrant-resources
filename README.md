@@ -53,6 +53,7 @@ New to Qdrant? Here's how to get started:
 5. **Vector Compression?** Read about [Google TurboQuant](TurboQuant/) - **✅ Ready!**
 6. **Quantization tradeoffs?** Compare them in the [Quantization Face-Off](Quantization-FaceOff/) - **✅ Ready!**
 7. **Exploring Qdrant 1.19?** Run the [Qdrant 1.19 hands-on demos](Qdrant-1.19-hands-on/) - **✅ Ready!**
+8. **Embedding without external API calls?** See [FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/) - **✅ Ready!**
 
 <hr>
 
@@ -75,6 +76,7 @@ New to Qdrant? Here's how to get started:
 - **[TurboQuant](TurboQuant/)** - High-recall vector quantization and memory-efficient search
 - **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** - Runnable demos for Turbo4, memory tiers, prefix matching, and parallel scrolling
 - **[Haystack + Qdrant](haystack-qdrant/)** - Qdrant Cloud integration with semantic retrieval and metadata filtering
+- **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** - Embedding models alongside Qdrant with no external API calls: FastEmbed, a local sidecar, and Qdrant Cloud's built-in inference, benchmarked on real data
 
 ### 🚧 **Coming Soon**
 - **[RAG Applications](RAG/)** - RAG resources and the practical [Just-RAG implementation](https://github.com/Goodnight77/Just-RAG)
@@ -92,6 +94,7 @@ New to Qdrant? Here's how to get started:
 | ✅ | **[Quantization Face-Off](Quantization-FaceOff/)** | Head-to-head benchmark of Qdrant quantization (f32 / SQ / PQ / BQ) on 1M-scale text embeddings | Recall vs latency vs RAM, rescoring sweeps, cost analysis, W&B telemetry |
 | ✅ | **[Chonkie Integration](chonkie/)** | Text chunking with seamless Qdrant integration | Multiple chunking strategies, performance comparison |
 | ✅ | **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** | Runnable examples for the Qdrant 1.19 release | Turbo4, memory tiers, prefix filters, parallel scrolling |
+| ✅ | **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** | CPU/GPU/Qdrant Cloud embedding benchmarks on real data, no external API calls | Real-data indexing throughput, query latency, retrieval quality (hit-rate@10, MRR@10) across three deployment patterns |
 | 🚧 | **Image Recommendations** | Image similarity search systems (in development) | Computer vision, embeddings, similarity search |
 | 🚧 | **Agent Workflows** | AI agent implementations (planned) | LangGraph, agentic RAG, vector memory |
 
@@ -102,7 +105,7 @@ New to Qdrant? Here's how to get started:
 | Status | Integration | Description | Tutorial |
 | --- | --- | --- | --- |
 | ✅ | **Chonkie** | Advanced text chunking with Qdrant handshake | [Tutorial](chonkie/Chonkie_Qdrant_Handshake_READY.ipynb) |
-| 🚧 | **FastEmbed** | Fast, lightweight embedding library | Coming Soon |
+| ✅ | **FastEmbed** | Fast, lightweight embedding library | [Guide + benchmarks](FastEmbed-Cloud-Inference/) |
 | ✅ | **bm25-go-hybrid** | Dense + sparse (BM25) hybrid search in Go, using a FastEmbed-compatible sparse encoder | [Demo](bm25-go-hybrid/) |
 | ✅ | **Haystack** | Qdrant Cloud as vector database inside a Haystack pipeline, with payload indexing and metadata filtering | [Tutorial](haystack-qdrant/) |
 | 🚧 | **LangChain** | Python framework for LLM applications | Coming Soon |
