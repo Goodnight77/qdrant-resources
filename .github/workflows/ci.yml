@@ -35,7 +35,7 @@ jobs:
 
       - name: Detect changed Python files
         id: changed_py
-        uses: tj-actions/changed-files@v45
+        uses: tj-actions/changed-files@v47
         with:
           files: |
             **/*.py
