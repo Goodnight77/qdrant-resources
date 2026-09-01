@@ -6,7 +6,7 @@ dependencies = [
     "datasets>=5.0.0",
     "matplotlib>=3.11.1",
     "numpy>=2.5.2",
-    "python-dotenv>=1.2.2",
+    "python-dotenv>=1.2.3",
     "qdrant-client>=1.19.0",
     "wandb>=0.29.0",
 ]
