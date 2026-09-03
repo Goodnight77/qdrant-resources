@@ -1,0 +1,171 @@
+{
+  "real_flagship": {
+    "n_docs_indexed": 12000,
+    "n_pairs_measured": 132,
+    "global_ndcg_mean": 0.8693462523925531,
+    "scoped_ndcg_mean": 0.8789242285950245,
+    "per_category": {
+      "world": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.9549792620043718,
+        "scoped_ndcg_mean": 0.9549792620043718
+      },
+      "sports": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.895924235390428,
+        "scoped_ndcg_mean": 0.895924235390428
+      },
+      "business": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.8557654225192565,
+        "scoped_ndcg_mean": 0.8856952922096971
+      },
+      "scitech": {
+        "n_pairs": 24,
+        "global_ndcg_mean": 0.7214010082879582,
+        "scoped_ndcg_mean": 0.7291850728658895
+      }
+    },
+    "discovered_pairs": {
+      "world": {
+        "domain_common": [
+          "minister",
+          "killed",
+          "prime",
+          "iraqi",
+          "leader",
+          "military"
+        ],
+        "domain_rare": [
+          "israel",
+          "hostage",
+          "gaza",
+          "north",
+          "region",
+          "leaders"
+        ]
+      },
+      "sports": {
+        "domain_common": [
+          "league",
+          "cup",
+          "coach",
+          "sports",
+          "points",
+          "olympic"
+        ],
+        "domain_rare": [
+          "title",
+          "champions",
+          "medal",
+          "boston",
+          "match",
+          "straight"
+        ]
+      },
+      "business": {
+        "domain_common": [
+          "prices",
+          "stocks",
+          "profit",
+          "shares",
+          "growth",
+          "investor"
+        ],
+        "domain_rare": [
+          "biggest",
+          "fell",
+          "street",
+          "crude",
+          "cut",
+          "wall"
+        ]
+      },
+      "scitech": {
+        "domain_common": [
+          "space",
+          "music",
+          "users",
+          "search"
+        ],
+        "domain_rare": [
+          "version",
+          "digital",
+          "nasa",
+          "linux",
+          "systems",
+          "use"
+        ]
+      }
+    }
+  },
+  "real_category_sweep": [
+    {
+      "n_tenants": 2,
+      "n_pairs_measured": 72,
+      "global_ndcg_mean": 0.9298651189597135,
+      "scoped_ndcg_mean": 0.9503746417474898
+    },
+    {
+      "n_tenants": 3,
+      "n_pairs_measured": 108,
+      "global_ndcg_mean": 0.9237193106509878,
+      "scoped_ndcg_mean": 0.9440894757960265
+    },
+    {
+      "n_tenants": 4,
+      "n_pairs_measured": 132,
+      "global_ndcg_mean": 0.8693462523925531,
+      "scoped_ndcg_mean": 0.8789242285950245
+    }
+  ],
+  "synthetic_flagship": {
+    "n_tenants": 3,
+    "docs_per_tenant": 500,
+    "global_ndcg_mean": 0.815,
+    "global_ndcg_std": 0.3882975663070785,
+    "scoped_ndcg_mean": 1.0,
+    "scoped_ndcg_std": 0.0,
+    "per_tenant": {
+      "fintech": {
+        "global_ndcg_mean": 0.7647058823529411,
+        "scoped_ndcg_mean": 1.0
+      },
+      "healthcare": {
+        "global_ndcg_mean": 0.8507462686567164,
+        "scoped_ndcg_mean": 1.0
+      },
+      "gaming": {
+        "global_ndcg_mean": 0.8307692307692308,
+        "scoped_ndcg_mean": 1.0
+      }
+    }
+  },
+  "synthetic_tenant_count_sweep": [
+    {
+      "n_tenants": 2,
+      "global_ndcg_mean": 0.825,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 3,
+      "global_ndcg_mean": 0.7875,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 6,
+      "global_ndcg_mean": 0.825,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 10,
+      "global_ndcg_mean": 0.775,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 20,
+      "global_ndcg_mean": 0.8875,
+      "scoped_ndcg_mean": 1.0
+    }
+  ]
+}

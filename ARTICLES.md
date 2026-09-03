@@ -16,6 +16,7 @@ A collection of articles covering Qdrant vector database, RAG systems, and integ
 
 ## Advanced Topics
 7. [One Collection to Rule Them All: Efficient Multitenancy in Qdrant](https://medium.com/@mohammedarbinsibi/one-collection-to-rule-them-all-efficient-multitenancy-in-qdrant-bda79712a4eb)
+   ↳ Try it: [Multitenancy-Playbook/](Multitenancy-Playbook/)
 8. [Breaking the Memory Wall: A Quantization Guide](https://medium.com/@mohammedarbinsibi/breaking-the-memory-wall-a-quantization-guide-b788ea961b8e)
 9. [16× Smaller Vectors in Qdrant: Memory, Recall, and Latency Results](https://medium.com/@mohammedarbinsibi/16-smaller-vectors-in-qdrant-memory-recall-and-latency-results-6081bda5092f)
    ↳ Try it: [Quantization-FaceOff/](Quantization-FaceOff/)
