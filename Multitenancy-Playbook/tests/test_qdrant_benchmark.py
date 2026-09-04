@@ -2,16 +2,25 @@ import unittest
 from unittest.mock import Mock, patch
 
 import numpy as np
-
-from mtp.qdrant_graph_isolation import collections, exact_topk, make_workload, measure, summarize
+from mtp.qdrant_graph_isolation import (
+    collections,
+    exact_topk,
+    make_workload,
+    measure,
+    summarize,
+)
 
 
 class BenchmarkTests(unittest.TestCase):
     def test_ground_truth_returns_global_ids(self):
-        vectors = np.array([[1., 0.], [0., 1.], [-1., 0.]])
-        queries = np.array([[1., 0.], [-1., 0.]])
-        self.assertEqual(exact_topk(vectors, queries, np.array([12, 25, 99]), 1), [{12}, {99}])
-        self.assertEqual(exact_topk(vectors, queries[:1], np.array([12, 25, 99]), 10), [{12, 25, 99}])
+        vectors = np.array([[1.0, 0.0], [0.0, 1.0], [-1.0, 0.0]])
+        queries = np.array([[1.0, 0.0], [-1.0, 0.0]])
+        self.assertEqual(
+            exact_topk(vectors, queries, np.array([12, 25, 99]), 1), [{12}, {99}]
+        )
+        self.assertEqual(
+            exact_topk(vectors, queries[:1], np.array([12, 25, 99]), 10), [{12, 25, 99}]
+        )
 
     def test_median_p95_and_recall(self):
         result = summarize([1, 2, 3, 4], [0.1, 0.2, 0.3, 0.4], [1, 1, 0.9, 0.9])
@@ -37,10 +46,12 @@ class BenchmarkTests(unittest.TestCase):
     def test_failed_second_creation_cleans_only_the_first_owned_collection(self):
         client = Mock()
         client.create_collection.side_effect = [True, RuntimeError("creation failed")]
-        with patch("mtp.qdrant_graph_isolation.wait_indexed", return_value={}):
-            with self.assertRaisesRegex(RuntimeError, "creation failed"):
-                with collections(client, np.ones((2, 4)), np.array([0, 1]), ["shared", "tenant"]):
-                    self.fail("second creation should fail")
+        with patch(
+            "mtp.qdrant_graph_isolation.wait_indexed", return_value={}
+        ), self.assertRaisesRegex(RuntimeError, "creation failed"), collections(
+            client, np.ones((2, 4)), np.array([0, 1]), ["shared", "tenant"]
+        ):
+            self.fail("second creation should fail")
         owned = client.create_collection.call_args_list[0].args[0]
         client.delete_collection.assert_called_once_with(owned)
 
@@ -49,14 +60,19 @@ class BenchmarkTests(unittest.TestCase):
             return 2.0, 0.5, 1.0 if exact or collection == "tenant" else 0.95
 
         case = (0, 0, [1.0], {0})
-        with patch("mtp.qdrant_graph_isolation.query", side_effect=response), \
-                patch("mtp.qdrant_graph_isolation.EF_CANDIDATES", [100]), \
-                patch("mtp.qdrant_graph_isolation.REPEATS", 1):
-            result = measure(Mock(), {"shared": "shared", "tenant": "tenant"}, [case], [case], 42)
+        with patch("mtp.qdrant_graph_isolation.query", side_effect=response), patch(
+            "mtp.qdrant_graph_isolation.EF_CANDIDATES", [100]
+        ), patch("mtp.qdrant_graph_isolation.REPEATS", 1):
+            result = measure(
+                Mock(), {"shared": "shared", "tenant": "tenant"}, [case], [case], 42
+            )
         self.assertFalse(result["validation_target_met"])
         self.assertFalse(result["quality_comparable"])
         self.assertEqual(result["summary"]["shared"]["recall_at_10"], 0.95)
-        self.assertEqual(result["validation_history"], [{"hnsw_ef": 100, "recall": {"shared": 0.95, "tenant": 1.0}}])
+        self.assertEqual(
+            result["validation_history"],
+            [{"hnsw_ef": 100, "recall": {"shared": 0.95, "tenant": 1.0}}],
+        )
 
 
 if __name__ == "__main__":

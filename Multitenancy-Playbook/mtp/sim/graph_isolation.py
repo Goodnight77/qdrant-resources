@@ -28,7 +28,9 @@ def run():
 
     print(f"building shared graph over {n} vectors (dim={dim}) ...")
     t0 = time.time()
-    shared_index = build_hnsw_index(vectors, all_ids, dim, config.E1_HNSW_M, config.E1_EF_CONSTRUCTION)
+    shared_index = build_hnsw_index(
+        vectors, all_ids, dim, config.E1_HNSW_M, config.E1_EF_CONSTRUCTION
+    )
     shared_build_s = time.time() - t0
     shared_index.set_ef(config.E1_EF_SEARCH)
     print(f"  done in {shared_build_s:.1f}s")
@@ -37,7 +39,9 @@ def run():
     for n_tenants in config.E1_TENANT_COUNTS:
         tenant_ids = rng.integers(0, n_tenants, n)
         selectivity = 1.0 / n_tenants
-        sample_tenants = rng.choice(n_tenants, size=min(config.E1_SAMPLE_TENANTS, n_tenants), replace=False)
+        sample_tenants = rng.choice(
+            n_tenants, size=min(config.E1_SAMPLE_TENANTS, n_tenants), replace=False
+        )
 
         shared_recalls, shared_latencies = [], []
         dedicated_recalls, dedicated_latencies = [], []
@@ -56,7 +60,11 @@ def run():
             t0 = time.time()
             local_ids = np.arange(len(tenant_vec_ids))
             dedicated_index = build_hnsw_index(
-                tenant_vectors, local_ids, dim, config.E1_HNSW_M, config.E1_EF_CONSTRUCTION
+                tenant_vectors,
+                local_ids,
+                dim,
+                config.E1_HNSW_M,
+                config.E1_EF_CONSTRUCTION,
             )
             dedicated_build_times.append(time.time() - t0)
             dedicated_index.set_ef(config.E1_EF_SEARCH)
@@ -70,7 +78,13 @@ def run():
                 gt = tenant_vec_ids[brute_force_topk(q, tenant_vectors, k)]
 
                 t0 = time.time()
-                lbl, _ = shared_index.knn_query(q, k=k, filter=lambda l: tenant_membership[l])
+                lbl, _ = shared_index.knn_query(
+                    q,
+                    k=k,
+                    filter=lambda point_id, membership=tenant_membership: membership[
+                        point_id
+                    ],
+                )
                 shared_latencies.append(time.time() - t0)
                 shared_recalls.append(len(set(lbl[0]) & set(gt)) / k)
 
@@ -80,17 +94,25 @@ def run():
                 dedicated_ids = tenant_vec_ids[lbl_d[0]]
                 dedicated_recalls.append(len(set(dedicated_ids) & set(gt)) / k)
 
-        rows.append({
-            "n_tenants": n_tenants,
-            "selectivity_pct": selectivity * 100,
-            "shared_recall_at_10": float(np.mean(shared_recalls)),
-            "shared_latency_ms": float(np.mean(shared_latencies) * 1000),
-            "shared_latency_p95_ms": float(np.percentile(shared_latencies, 95) * 1000),
-            "dedicated_recall_at_10": float(np.mean(dedicated_recalls)),
-            "dedicated_latency_ms": float(np.mean(dedicated_latencies) * 1000),
-            "dedicated_latency_p95_ms": float(np.percentile(dedicated_latencies, 95) * 1000),
-            "dedicated_build_ms_per_tenant": float(np.mean(dedicated_build_times) * 1000),
-        })
+        rows.append(
+            {
+                "n_tenants": n_tenants,
+                "selectivity_pct": selectivity * 100,
+                "shared_recall_at_10": float(np.mean(shared_recalls)),
+                "shared_latency_ms": float(np.mean(shared_latencies) * 1000),
+                "shared_latency_p95_ms": float(
+                    np.percentile(shared_latencies, 95) * 1000
+                ),
+                "dedicated_recall_at_10": float(np.mean(dedicated_recalls)),
+                "dedicated_latency_ms": float(np.mean(dedicated_latencies) * 1000),
+                "dedicated_latency_p95_ms": float(
+                    np.percentile(dedicated_latencies, 95) * 1000
+                ),
+                "dedicated_build_ms_per_tenant": float(
+                    np.mean(dedicated_build_times) * 1000
+                ),
+            }
+        )
         print(
             f"tenants={n_tenants:>5} (selectivity {selectivity*100:5.2f}%)  "
             f"shared recall@10={rows[-1]['shared_recall_at_10']:.3f} "
@@ -104,6 +126,7 @@ def run():
 
 if __name__ == "__main__":
     import json
+
     result = run()
     with open(config.results_path("exp1_graph_isolation.json"), "w") as f:
         json.dump(result, f, indent=2)

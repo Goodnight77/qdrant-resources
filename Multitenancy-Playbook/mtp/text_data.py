@@ -24,7 +24,6 @@ import numpy as np
 
 
 def build_vocab_and_tenants(tenants, n_common, n_domain_common, n_domain_rare, seed):
-    rng = np.random.default_rng(seed)
     vocab = []
     common_words = [f"common_{i}" for i in range(n_common)]
     vocab += common_words
@@ -40,7 +39,17 @@ def build_vocab_and_tenants(tenants, n_common, n_domain_common, n_domain_rare, s
     return word_to_id, common_words, tenant_vocab
 
 
-def generate_tenant_docs(tenant, common_words, domain_common, domain_rare, n_docs, doc_len_range, domain_common_prob, domain_rare_prob, seed):
+def generate_tenant_docs(
+    tenant,
+    common_words,
+    domain_common,
+    domain_rare,
+    n_docs,
+    doc_len_range,
+    domain_common_prob,
+    domain_rare_prob,
+    seed,
+):
     """Returns a list of dicts: {"tokens": [...], "rare_hits": set(word)}.
 
     domain_common[i] and domain_rare[i] are paired: a ticket that actually

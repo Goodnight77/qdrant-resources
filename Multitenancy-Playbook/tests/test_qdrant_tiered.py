@@ -2,7 +2,6 @@ import unittest
 from unittest.mock import Mock, patch
 
 import numpy as np
-
 from mtp.qdrant_tiered import check_routing, collections, make_workloads, routed_query
 
 
@@ -39,10 +38,13 @@ class TieredTests(unittest.TestCase):
     def test_failed_shard_creation_cleans_only_owned_collection(self):
         client = Mock()
         client.create_shard_key.side_effect = RuntimeError("shard failed")
-        with self.assertRaisesRegex(RuntimeError, "shard failed"):
-            with collections(client, np.ones((2, 4)), np.array([0, 1])):
-                self.fail("shard creation should fail")
-        client.delete_collection.assert_called_once_with(client.create_collection.call_args.args[0])
+        with self.assertRaisesRegex(RuntimeError, "shard failed"), collections(
+            client, np.ones((2, 4)), np.array([0, 1])
+        ):
+            self.fail("shard creation should fail")
+        client.delete_collection.assert_called_once_with(
+            client.create_collection.call_args.args[0]
+        )
 
 
 if __name__ == "__main__":

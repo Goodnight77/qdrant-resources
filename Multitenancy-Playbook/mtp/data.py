@@ -19,7 +19,7 @@ def assign_tenants_whale_and_minnows(n, whale_n, minnow_count, minnow_n_each):
     tenant_ids[:whale_n] = 0
     for i in range(minnow_count):
         start = whale_n + i * minnow_n_each
-        tenant_ids[start:start + minnow_n_each] = i + 1
+        tenant_ids[start : start + minnow_n_each] = i + 1
     return tenant_ids
 
 

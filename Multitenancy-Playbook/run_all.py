@@ -17,7 +17,9 @@ def main():
     print("=" * 70)
     print("Experiment 1: Qdrant indexed shared vs. tenant-optimized search")
     print("=" * 70)
-    qdrant_graph_isolation.run(Path(config.results_path("exp1_qdrant_graph_isolation.json")))
+    qdrant_graph_isolation.run(
+        Path(config.results_path("exp1_qdrant_graph_isolation.json"))
+    )
 
     print()
     print("=" * 70)

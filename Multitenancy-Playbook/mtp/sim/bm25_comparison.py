@@ -13,7 +13,12 @@ import numpy as np
 
 from mtp import config
 from mtp.real_text_data import CATEGORIES, discover_word_pairs, load_ag_news_sample
-from mtp.sim.per_tenant_idf import _backend_metadata, _experiment_collection, _index_real_sample, _measure_real_pairs
+from mtp.sim.per_tenant_idf import (
+    _backend_metadata,
+    _experiment_collection,
+    _index_real_sample,
+    _measure_real_pairs,
+)
 
 
 def run():
@@ -42,7 +47,9 @@ def run():
     scores = {}
     for variant, weights in [("raw_tf", None), ("bm25", params)]:
         with _experiment_collection() as (client, collection):
-            n_indexed = _index_real_sample(client, collection, sample, word_to_id, weights)
+            n_indexed = _index_real_sample(
+                client, collection, sample, word_to_id, weights
+            )
             per_category, gs, ss = _measure_real_pairs(
                 client, collection, CATEGORIES, pairs, word_to_id, config.E3_K
             )
@@ -54,7 +61,10 @@ def run():
             "scoped_ndcg_mean": float(np.mean(ss)),
             "per_category": per_category,
         }
-        print(f"{variant}: global NDCG@10={np.mean(gs):.3f}, scoped NDCG@10={np.mean(ss):.3f}", flush=True)
+        print(
+            f"{variant}: global NDCG@10={np.mean(gs):.3f}, scoped NDCG@10={np.mean(ss):.3f}",
+            flush=True,
+        )
     result["paired_changes"] = {}
     for mode in ["global", "scoped"]:
         delta = scores["bm25"][mode] - scores["raw_tf"][mode]
@@ -73,7 +83,11 @@ if __name__ == "__main__":
     from pathlib import Path
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path(config.results_path("exp3_bm25_comparison.json")))
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path(config.results_path("exp3_bm25_comparison.json")),
+    )
     args = parser.parse_args()
     result = run()
     with args.output.open("w") as f:

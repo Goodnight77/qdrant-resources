@@ -29,7 +29,11 @@ import time
 import numpy as np
 
 from mtp import config
-from mtp.data import assign_tenants_whale_and_minnows, brute_force_topk, build_hnsw_index
+from mtp.data import (
+    assign_tenants_whale_and_minnows,
+    brute_force_topk,
+    build_hnsw_index,
+)
 from mtp.real_data import load_dbpedia_vectors
 
 
@@ -44,18 +48,28 @@ def run():
     minnow_count = config.E2_MINNOW_COUNT
     whale_n = int(n * config.E2_WHALE_FRACTION)
     minnow_n_each = (n - whale_n) // minnow_count
-    whale_n = n - minnow_n_each * minnow_count  # absorb the rounding remainder into the whale
+    whale_n = (
+        n - minnow_n_each * minnow_count
+    )  # absorb the rounding remainder into the whale
 
-    tenant_ids = assign_tenants_whale_and_minnows(n, whale_n, minnow_count, minnow_n_each)
+    tenant_ids = assign_tenants_whale_and_minnows(
+        n, whale_n, minnow_count, minnow_n_each
+    )
     all_ids = np.arange(n)
-    print(f"  {n} base vectors ({whale_n} whale + {minnow_count} x {minnow_n_each} minnows), {len(query_pool)} held-out queries")
+    print(
+        f"  {n} base vectors ({whale_n} whale + {minnow_count} x {minnow_n_each} minnows), {len(query_pool)} held-out queries"
+    )
 
     whale_mask = tenant_ids == 0
     minnow_mask = ~whale_mask
 
-    print(f"naive: building one shared graph over all {n} vectors (whale is {whale_mask.mean()*100:.0f}% of it) ...")
+    print(
+        f"naive: building one shared graph over all {n} vectors (whale is {whale_mask.mean()*100:.0f}% of it) ..."
+    )
     t0 = time.time()
-    naive_index = build_hnsw_index(vectors, all_ids, dim, config.E2_HNSW_M, config.E2_EF_CONSTRUCTION)
+    naive_index = build_hnsw_index(
+        vectors, all_ids, dim, config.E2_HNSW_M, config.E2_EF_CONSTRUCTION
+    )
     naive_build_s = time.time() - t0
     naive_index.set_ef(config.E2_EF_SEARCH)
     print(f"  done in {naive_build_s:.1f}s")
@@ -63,17 +77,29 @@ def run():
     print(f"tiered: building a dedicated whale graph ({whale_mask.sum()} vectors) ...")
     t0 = time.time()
     whale_ids_local = np.arange(whale_mask.sum())
-    whale_index = build_hnsw_index(vectors[whale_mask], whale_ids_local, dim, config.E2_HNSW_M, config.E2_EF_CONSTRUCTION)
+    whale_index = build_hnsw_index(
+        vectors[whale_mask],
+        whale_ids_local,
+        dim,
+        config.E2_HNSW_M,
+        config.E2_EF_CONSTRUCTION,
+    )
     whale_build_s = time.time() - t0
     whale_index.set_ef(config.E2_EF_SEARCH)
     whale_global_ids = all_ids[whale_mask]
     print(f"  done in {whale_build_s:.1f}s")
 
-    print(f"tiered: building a shared fallback graph for the {minnow_count} minnows ({minnow_mask.sum()} vectors) ...")
+    print(
+        f"tiered: building a shared fallback graph for the {minnow_count} minnows ({minnow_mask.sum()} vectors) ..."
+    )
     t0 = time.time()
     minnow_ids_local = np.arange(minnow_mask.sum())
     fallback_index = build_hnsw_index(
-        vectors[minnow_mask], minnow_ids_local, dim, config.E2_HNSW_M, config.E2_EF_CONSTRUCTION
+        vectors[minnow_mask],
+        minnow_ids_local,
+        dim,
+        config.E2_HNSW_M,
+        config.E2_EF_CONSTRUCTION,
     )
     fallback_build_s = time.time() - t0
     fallback_index.set_ef(config.E2_EF_SEARCH)
@@ -101,12 +127,16 @@ def run():
             gt = tenant_vec_ids[brute_force_topk(q, tenant_vectors, k)]
 
             t0 = time.time()
-            lbl, _ = naive_index.knn_query(q, k=k, filter=lambda l: tenant_membership_full[l])
+            lbl, _ = naive_index.knn_query(
+                q, k=k, filter=lambda l: tenant_membership_full[l]
+            )
             naive_lat.append(time.time() - t0)
             naive_recalls.append(len(set(lbl[0]) & set(gt)) / k)
 
             t0 = time.time()
-            lbl_f, _ = fallback_index.knn_query(q, k=k, filter=lambda l: tenant_mask_in_fallback[l])
+            lbl_f, _ = fallback_index.knn_query(
+                q, k=k, filter=lambda l: tenant_mask_in_fallback[l]
+            )
             tiered_lat.append(time.time() - t0)
             tiered_ids = minnow_global_ids[lbl_f[0]]
             tiered_recalls.append(len(set(tiered_ids) & set(gt)) / k)
@@ -145,7 +175,9 @@ def run():
             "tiered_latency_ms": float(np.mean(tiered_lat) * 1000),
         }
 
-    sample_minnows = rng.choice(np.arange(1, minnow_count + 1), size=config.E2_SAMPLE_MINNOWS, replace=False)
+    sample_minnows = rng.choice(
+        np.arange(1, minnow_count + 1), size=config.E2_SAMPLE_MINNOWS, replace=False
+    )
     minnow_rows = []
     for tenant in sample_minnows:
         r = eval_minnow(int(tenant), config.E2_QUERIES_PER_TENANT)
@@ -153,10 +185,18 @@ def run():
             minnow_rows.append(r)
 
     minnow_summary = {
-        "naive_recall_at_10": float(np.mean([r["naive_recall_at_10"] for r in minnow_rows])),
-        "naive_latency_ms": float(np.mean([r["naive_latency_ms"] for r in minnow_rows])),
-        "tiered_recall_at_10": float(np.mean([r["tiered_recall_at_10"] for r in minnow_rows])),
-        "tiered_latency_ms": float(np.mean([r["tiered_latency_ms"] for r in minnow_rows])),
+        "naive_recall_at_10": float(
+            np.mean([r["naive_recall_at_10"] for r in minnow_rows])
+        ),
+        "naive_latency_ms": float(
+            np.mean([r["naive_latency_ms"] for r in minnow_rows])
+        ),
+        "tiered_recall_at_10": float(
+            np.mean([r["tiered_recall_at_10"] for r in minnow_rows])
+        ),
+        "tiered_latency_ms": float(
+            np.mean([r["tiered_latency_ms"] for r in minnow_rows])
+        ),
     }
     whale_summary = eval_whale(config.E2_QUERIES_PER_TENANT * 3)
 
@@ -177,6 +217,7 @@ def run():
 
 if __name__ == "__main__":
     import json
+
     result = run()
     with open(config.results_path("exp2_tiered.json"), "w") as f:
         json.dump(result, f, indent=2)

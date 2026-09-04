@@ -29,7 +29,9 @@ def load_dbpedia_vectors(n_query, seed):
 
     frames = []
     for fname in SHARD_FILES:
-        path = hf_hub_download(repo_id=REPO_ID, repo_type="dataset", filename=fname, cache_dir=CACHE_DIR)
+        path = hf_hub_download(
+            repo_id=REPO_ID, repo_type="dataset", filename=fname, cache_dir=CACHE_DIR
+        )
         frames.append(pd.read_parquet(path, columns=["openai"]))
     df = pd.concat(frames, ignore_index=True)
     vectors = np.stack(df["openai"].to_numpy()).astype(np.float32)

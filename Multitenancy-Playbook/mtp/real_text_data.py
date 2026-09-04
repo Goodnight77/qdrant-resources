@@ -30,9 +30,31 @@ TOKEN_RE = re.compile(r"[a-z]{3,}")
 # from which words get *picked* to headline the demo; the underlying
 # frequency stats are computed over the real, un-filtered vocabulary.
 GENERIC_STOPLIST = {
-    "www", "href", "com", "the", "and", "for", "that", "with", "this", "from",
-    "has", "have", "will", "are", "was", "were", "its", "his", "her", "their",
-    "target", "available", "size", "system", "web",
+    "www",
+    "href",
+    "com",
+    "the",
+    "and",
+    "for",
+    "that",
+    "with",
+    "this",
+    "from",
+    "has",
+    "have",
+    "will",
+    "are",
+    "was",
+    "were",
+    "its",
+    "his",
+    "her",
+    "their",
+    "target",
+    "available",
+    "size",
+    "system",
+    "web",
 }
 
 
@@ -42,7 +64,9 @@ def tokenize(text):
 
 def load_ag_news_sample(n_per_category, seed):
     """Returns a DataFrame with columns: category, tokens (list[str])."""
-    path = hf_hub_download(repo_id=REPO_ID, repo_type="dataset", filename=FILENAME, cache_dir=CACHE_DIR)
+    path = hf_hub_download(
+        repo_id=REPO_ID, repo_type="dataset", filename=FILENAME, cache_dir=CACHE_DIR
+    )
     df = pd.read_parquet(path)
 
     frames = []

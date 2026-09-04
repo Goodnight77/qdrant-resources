@@ -17,32 +17,34 @@ GRIDLINE = "#e1e0d9"
 SURFACE = "#fcfcfb"
 
 # fixed roles used consistently across every chart in this project
-SHARED_COLOR = BLUE       # unpartitioned / naive / global-IDF ("before")
+SHARED_COLOR = BLUE  # unpartitioned / naive / global-IDF ("before")
 DEDICATED_COLOR = ORANGE  # is_tenant / dedicated shard / per-tenant IDF ("after")
 WHALE_COLOR = VIOLET
 
 
 def apply_style():
-    plt.rcParams.update({
-        "figure.facecolor": SURFACE,
-        "axes.facecolor": SURFACE,
-        "savefig.facecolor": SURFACE,
-        "axes.edgecolor": GRIDLINE,
-        "axes.labelcolor": INK_SECONDARY,
-        "text.color": INK,
-        "xtick.color": INK_MUTED,
-        "ytick.color": INK_MUTED,
-        "grid.color": GRIDLINE,
-        "font.size": 11,
-        "font.family": "sans-serif",
-        "axes.grid": True,
-        "grid.linewidth": 0.7,
-        "axes.spines.top": False,
-        "axes.spines.right": False,
-        "axes.titlecolor": INK,
-        "axes.titleweight": "bold",
-        "legend.frameon": False,
-    })
+    plt.rcParams.update(
+        {
+            "figure.facecolor": SURFACE,
+            "axes.facecolor": SURFACE,
+            "savefig.facecolor": SURFACE,
+            "axes.edgecolor": GRIDLINE,
+            "axes.labelcolor": INK_SECONDARY,
+            "text.color": INK,
+            "xtick.color": INK_MUTED,
+            "ytick.color": INK_MUTED,
+            "grid.color": GRIDLINE,
+            "font.size": 11,
+            "font.family": "sans-serif",
+            "axes.grid": True,
+            "grid.linewidth": 0.7,
+            "axes.spines.top": False,
+            "axes.spines.right": False,
+            "axes.titlecolor": INK,
+            "axes.titleweight": "bold",
+            "legend.frameon": False,
+        }
+    )
 
 
 def style_axes(ax):

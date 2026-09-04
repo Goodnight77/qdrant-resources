@@ -28,16 +28,26 @@ import numpy as np
 from qdrant_client import QdrantClient, models
 
 from mtp import config
-from mtp.real_text_data import CATEGORIES, discover_word_pairs, load_ag_news_sample
-from mtp.real_text_data import tokens_to_bm25
+from mtp.real_text_data import (
+    CATEGORIES,
+    discover_word_pairs,
+    load_ag_news_sample,
+    tokens_to_bm25,
+)
 from mtp.real_text_data import tokens_to_sparse as real_tokens_to_sparse
-from mtp.text_data import build_vocab_and_tenants, generate_tenant_docs, tokens_to_sparse
+from mtp.text_data import (
+    build_vocab_and_tenants,
+    generate_tenant_docs,
+    tokens_to_sparse,
+)
 
 
 def _make_client():
     url = os.environ.get("QDRANT_URL")
     if url:
-        return QdrantClient(url=url, api_key=os.environ.get("QDRANT_API_KEY") or None, timeout=60)
+        return QdrantClient(
+            url=url, api_key=os.environ.get("QDRANT_API_KEY") or None, timeout=60
+        )
     return QdrantClient(":memory:")
 
 
@@ -62,13 +72,17 @@ def _experiment_collection():
         client.create_collection(
             collection,
             vectors_config={},
-            sparse_vectors_config={"bm25": models.SparseVectorParams(modifier=models.Modifier.IDF)},
+            sparse_vectors_config={
+                "bm25": models.SparseVectorParams(modifier=models.Modifier.IDF)
+            },
         )
         created = True
         client.create_payload_index(
             collection,
             field_name="tenant",
-            field_schema=models.KeywordIndexParams(type=models.KeywordIndexType.KEYWORD, is_tenant=True),
+            field_schema=models.KeywordIndexParams(
+                type=models.KeywordIndexType.KEYWORD, is_tenant=True
+            ),
         )
         yield client, collection
     finally:
@@ -89,15 +103,28 @@ def _ndcg_at_k(ranked_relevant, k, n_relevant):
 def _relevant_count(client, collection, tenant, word, field):
     return client.count(
         collection,
-        count_filter=models.Filter(must=[
-            models.FieldCondition(key="tenant", match=models.MatchValue(value=tenant)),
-            models.FieldCondition(key=field, match=models.MatchValue(value=word)),
-        ]),
+        count_filter=models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="tenant", match=models.MatchValue(value=tenant)
+                ),
+                models.FieldCondition(key=field, match=models.MatchValue(value=word)),
+            ]
+        ),
         exact=True,
     ).count
 
 
-def _setup_collection(client, collection, tenants, n_common, n_domain_common, n_domain_rare, docs_per_tenant, seed):
+def _setup_collection(
+    client,
+    collection,
+    tenants,
+    n_common,
+    n_domain_common,
+    n_domain_rare,
+    docs_per_tenant,
+    seed,
+):
     word_to_id, common_words, tenant_vocab = build_vocab_and_tenants(
         tenants, n_common, n_domain_common, n_domain_rare, seed
     )
@@ -123,44 +150,68 @@ def _setup_collection(client, collection, tenants, n_common, n_domain_common, n_
                 models.PointStruct(
                     id=point_id,
                     payload={"tenant": tenant, "rare_hits": list(d["rare_hits"])},
-                    vector={"bm25": models.SparseVector(indices=list(sparse.keys()), values=[float(v) for v in sparse.values()])},
+                    vector={
+                        "bm25": models.SparseVector(
+                            indices=list(sparse.keys()),
+                            values=[float(v) for v in sparse.values()],
+                        )
+                    },
                 )
             )
             all_docs.append(d)
             point_id += 1
 
     for i in range(0, len(points), 500):
-        client.upsert(collection, points=points[i:i + 500])
+        client.upsert(collection, points=points[i : i + 500])
 
     return word_to_id, tenant_vocab, all_docs
 
 
-def _run_trials(client, collection, word_to_id, tenant_vocab, tenants, n_trials, k, seed):
+def _run_trials(
+    client, collection, word_to_id, tenant_vocab, tenants, n_trials, k, seed
+):
     rng = np.random.default_rng(seed)
     global_scores, scoped_scores = [], []
     per_tenant = {t: {"global": [], "scoped": []} for t in tenants}
 
     for _ in range(n_trials):
         tenant = tenants[rng.integers(0, len(tenants))]
-        w_rare = tenant_vocab[tenant]["domain_rare"][rng.integers(0, len(tenant_vocab[tenant]["domain_rare"]))]
-        w_common = tenant_vocab[tenant]["domain_common"][rng.integers(0, len(tenant_vocab[tenant]["domain_common"]))]
+        w_rare = tenant_vocab[tenant]["domain_rare"][
+            rng.integers(0, len(tenant_vocab[tenant]["domain_rare"]))
+        ]
+        w_common = tenant_vocab[tenant]["domain_common"][
+            rng.integers(0, len(tenant_vocab[tenant]["domain_common"]))
+        ]
         query_vec = models.SparseVector(
             indices=[word_to_id[w_common], word_to_id[w_rare]], values=[1.0, 1.0]
         )
-        tenant_filter = models.Filter(must=[models.FieldCondition(key="tenant", match=models.MatchValue(value=tenant))])
+        tenant_filter = models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="tenant", match=models.MatchValue(value=tenant)
+                )
+            ]
+        )
 
-        def relevance(hit):
-            return 1 if w_rare in (hit.payload or {}).get("rare_hits", []) else 0
+        def relevance(hit, rare_word=w_rare):
+            return 1 if rare_word in (hit.payload or {}).get("rare_hits", []) else 0
 
         global_hits = client.query_points(
-            collection, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
+            collection,
+            query=query_vec,
+            using="bm25",
+            query_filter=tenant_filter,
+            limit=k,
+            with_payload=True,
         ).points
         scoped_hits = client.query_points(
             collection,
             query=query_vec,
             using="bm25",
             query_filter=tenant_filter,
-            search_params=models.SearchParams(idf=models.IdfCorpusParams(corpus=tenant_filter)),
+            search_params=models.SearchParams(
+                idf=models.IdfCorpusParams(corpus=tenant_filter)
+            ),
             limit=k,
             with_payload=True,
         ).points
@@ -182,7 +233,8 @@ def run_synthetic_flagship():
     headline number."""
     with _experiment_collection() as (client, collection):
         word_to_id, tenant_vocab, _ = _setup_collection(
-            client, collection,
+            client,
+            collection,
             config.E3_TENANTS,
             config.E3_N_COMMON_WORDS,
             config.E3_N_DOMAIN_COMMON,
@@ -191,7 +243,14 @@ def run_synthetic_flagship():
             config.SEED,
         )
         global_scores, scoped_scores, per_tenant = _run_trials(
-            client, collection, word_to_id, tenant_vocab, config.E3_TENANTS, config.E3_TRIALS, config.E3_K, config.SEED + 1
+            client,
+            collection,
+            word_to_id,
+            tenant_vocab,
+            config.E3_TENANTS,
+            config.E3_TRIALS,
+            config.E3_K,
+            config.SEED + 1,
         )
         result = {
             "n_tenants": len(config.E3_TENANTS),
@@ -224,7 +283,8 @@ def run_synthetic_tenant_count_sweep(tenant_counts, trials_per_point):
         tenants = [f"tenant_{i}" for i in range(t_count)]
         with _experiment_collection() as (client, collection):
             word_to_id, tenant_vocab, _ = _setup_collection(
-                client, collection,
+                client,
+                collection,
                 tenants,
                 config.E3_N_COMMON_WORDS,
                 config.E3_N_DOMAIN_COMMON,
@@ -233,14 +293,25 @@ def run_synthetic_tenant_count_sweep(tenant_counts, trials_per_point):
                 config.SEED + 100 + t_count,
             )
             global_scores, scoped_scores, _ = _run_trials(
-                client, collection, word_to_id, tenant_vocab, tenants, trials_per_point, config.E3_K, config.SEED + 200 + t_count
+                client,
+                collection,
+                word_to_id,
+                tenant_vocab,
+                tenants,
+                trials_per_point,
+                config.E3_K,
+                config.SEED + 200 + t_count,
             )
-            rows.append({
-                "n_tenants": t_count,
-                "global_ndcg_mean": float(np.mean(global_scores)),
-                "scoped_ndcg_mean": float(np.mean(scoped_scores)),
-            })
-            print(f"n_tenants={t_count:>3}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
+            rows.append(
+                {
+                    "n_tenants": t_count,
+                    "global_ndcg_mean": float(np.mean(global_scores)),
+                    "scoped_ndcg_mean": float(np.mean(scoped_scores)),
+                }
+            )
+            print(
+                f"n_tenants={t_count:>3}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}"
+            )
     return rows
 
 
@@ -258,11 +329,16 @@ def _index_real_sample(client, collection, sample, word_to_id, bm25_params=None)
             models.PointStruct(
                 id=i,
                 payload={"tenant": category, "tokens_present": list(set(tokens))},
-                vector={"bm25": models.SparseVector(indices=list(sparse.keys()), values=[float(v) for v in sparse.values()])},
+                vector={
+                    "bm25": models.SparseVector(
+                        indices=list(sparse.keys()),
+                        values=[float(v) for v in sparse.values()],
+                    )
+                },
             )
         )
     for i in range(0, len(points), 500):
-        client.upsert(collection, points=points[i:i + 500])
+        client.upsert(collection, points=points[i : i + 500])
     return len(points)
 
 
@@ -277,30 +353,56 @@ def _measure_real_pairs(client, collection, categories, pairs, word_to_id, k):
     for category in categories:
         common_words = [w for w in pairs[category]["domain_common"] if w in word_to_id]
         rare_words = [w for w in pairs[category]["domain_rare"] if w in word_to_id]
-        tenant_filter = models.Filter(must=[models.FieldCondition(key="tenant", match=models.MatchValue(value=category))])
+        tenant_filter = models.Filter(
+            must=[
+                models.FieldCondition(
+                    key="tenant", match=models.MatchValue(value=category)
+                )
+            ]
+        )
         gs, ss = [], []
         for w_common in common_words:
             for w_rare in rare_words:
-                query_vec = models.SparseVector(indices=[word_to_id[w_common], word_to_id[w_rare]], values=[1.0, 1.0])
+                query_vec = models.SparseVector(
+                    indices=[word_to_id[w_common], word_to_id[w_rare]],
+                    values=[1.0, 1.0],
+                )
                 global_hits = client.query_points(
-                    collection, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
+                    collection,
+                    query=query_vec,
+                    using="bm25",
+                    query_filter=tenant_filter,
+                    limit=k,
+                    with_payload=True,
                 ).points
                 scoped_hits = client.query_points(
                     collection,
                     query=query_vec,
                     using="bm25",
                     query_filter=tenant_filter,
-                    search_params=models.SearchParams(idf=models.IdfCorpusParams(corpus=tenant_filter)),
+                    search_params=models.SearchParams(
+                        idf=models.IdfCorpusParams(corpus=tenant_filter)
+                    ),
                     limit=k,
                     with_payload=True,
                 ).points
 
                 def relevance(hit, w_rare=w_rare):
-                    return 1 if w_rare in (hit.payload or {}).get("tokens_present", []) else 0
+                    return (
+                        1
+                        if w_rare in (hit.payload or {}).get("tokens_present", [])
+                        else 0
+                    )
 
-                n_relevant = _relevant_count(client, collection, category, w_rare, "tokens_present")
-                gs.append(_ndcg_at_k([relevance(h) for h in global_hits], k, n_relevant))
-                ss.append(_ndcg_at_k([relevance(h) for h in scoped_hits], k, n_relevant))
+                n_relevant = _relevant_count(
+                    client, collection, category, w_rare, "tokens_present"
+                )
+                gs.append(
+                    _ndcg_at_k([relevance(h) for h in global_hits], k, n_relevant)
+                )
+                ss.append(
+                    _ndcg_at_k([relevance(h) for h in scoped_hits], k, n_relevant)
+                )
         if gs:
             per_category[category] = {
                 "n_pairs": len(gs),
@@ -325,7 +427,9 @@ def run_real_ag_news():
         word_to_id = {w: i for i, w in enumerate(sorted(vocab))}
         n_indexed = _index_real_sample(client, collection, sample, word_to_id)
 
-        per_category, all_global, all_scoped = _measure_real_pairs(client, collection, CATEGORIES, pairs, word_to_id, config.E3_K)
+        per_category, all_global, all_scoped = _measure_real_pairs(
+            client, collection, CATEGORIES, pairs, word_to_id, config.E3_K
+        )
         result = {
             "n_docs_indexed": n_indexed,
             "n_pairs_measured": len(all_global),
@@ -358,15 +462,27 @@ def run_real_category_sweep():
         with _experiment_collection() as (client, collection):
             subset = sample[sample["category"].isin(categories)]
             _index_real_sample(client, collection, subset, word_to_id)
-            pairs = discover_word_pairs(subset, categories, top_k=config.E3_AG_NEWS_TOP_K)
-            _, all_global, all_scoped = _measure_real_pairs(client, collection, categories, pairs, word_to_id, config.E3_K)
-            rows.append({
-                "n_tenants": t_count,
-                "n_pairs_measured": len(all_global),
-                "global_ndcg_mean": float(np.mean(all_global)) if all_global else None,
-                "scoped_ndcg_mean": float(np.mean(all_scoped)) if all_scoped else None,
-            })
-            print(f"real categories={t_count}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
+            pairs = discover_word_pairs(
+                subset, categories, top_k=config.E3_AG_NEWS_TOP_K
+            )
+            _, all_global, all_scoped = _measure_real_pairs(
+                client, collection, categories, pairs, word_to_id, config.E3_K
+            )
+            rows.append(
+                {
+                    "n_tenants": t_count,
+                    "n_pairs_measured": len(all_global),
+                    "global_ndcg_mean": (
+                        float(np.mean(all_global)) if all_global else None
+                    ),
+                    "scoped_ndcg_mean": (
+                        float(np.mean(all_scoped)) if all_scoped else None
+                    ),
+                }
+            )
+            print(
+                f"real categories={t_count}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}"
+            )
     return rows
 
 
@@ -375,7 +491,9 @@ def run():
     real_flagship = run_real_ag_news()
     real_sweep = run_real_category_sweep()
     synthetic_flagship = run_synthetic_flagship()
-    synthetic_sweep = run_synthetic_tenant_count_sweep(config.E3_SWEEP_TENANT_COUNTS, trials_per_point=config.E3_SWEEP_TRIALS)
+    synthetic_sweep = run_synthetic_tenant_count_sweep(
+        config.E3_SWEEP_TENANT_COUNTS, trials_per_point=config.E3_SWEEP_TRIALS
+    )
     return {
         "backend": backend,
         "metric": "binary_ndcg_at_k_corpus_relevance",
@@ -393,7 +511,11 @@ if __name__ == "__main__":
     from pathlib import Path
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path(config.results_path("exp3_per_tenant_idf.json")))
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path(config.results_path("exp3_per_tenant_idf.json")),
+    )
     args = parser.parse_args()
     result = run()
     with args.output.open("w") as f:
