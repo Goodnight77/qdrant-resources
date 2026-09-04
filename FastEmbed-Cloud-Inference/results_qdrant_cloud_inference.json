@@ -1,0 +1,22 @@
+{
+  "runtime": "Qdrant Cloud built-in inference (server-side embed, client on Modal)",
+  "dataset": "BeIR/nfcorpus",
+  "model": "BAAI/bge-small-en-v1.5",
+  "corpus_size": 3633,
+  "test_query_count": 323,
+  "resumed_from_docs": 2688,
+  "corpus_index_seconds": 621.0503115959999,
+  "corpus_index_docs_per_sec": 1.5216158535876123,
+  "real_query_latency_ms": {
+    "mean": 46.92128000928716,
+    "p50": 46.4421650000304,
+    "p95": 55.05174299992177,
+    "min": 38.86362499997631,
+    "max": 87.42850900000576
+  },
+  "retrieval_quality": {
+    "hit_rate_at_10": 0.7027863777089783,
+    "mrr_at_10": 0.5300592166691238,
+    "note": "Same methodology as results_real_data.json: hit_rate@10 = fraction of queries with >=1 known-relevant doc in the top 10; mrr_at_10 = mean reciprocal rank of the first relevant hit."
+  }
+}
