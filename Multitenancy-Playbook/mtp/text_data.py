@@ -13,11 +13,11 @@ Each tenant is a different "industry" with its own vocabulary:
 This is what makes the distortion in global IDF concrete and checkable: a
 domain-common word's raw document frequency is identical whether you count
 it globally or within the tenant (nobody else ever uses it), but the
-*denominator* (total corpus size) is much bigger globally than within one
+*corpus size* (N) is much bigger globally than within one
 tenant. log(N/df) with the big global N makes a word that is actually
 common-and-boring within its own tenant look rare-and-important, which
-misdirects BM25-style ranking. Per-tenant IDF fixes the denominator (and
-the count) to the tenant's own corpus.
+misdirects BM25-style ranking. Per-tenant IDF scopes the corpus size (and
+the document frequency) to the tenant's own corpus.
 """
 
 import numpy as np

@@ -1,30 +1,9 @@
-"""Experiment 1: payload partitioning vs. dedicated (is_tenant) graphs.
+"""Experiment 1: filtered shared HNSW versus separate per-tenant graphs.
 
-Qdrant's own docs describe `is_tenant=true` and dedicated per-tenant shards as
-two ways of getting the same underlying benefit: instead of one HNSW graph
-that links every tenant's vectors together and gets filtered post-hoc, each
-tenant gets its own graph (or its own tenant-restricted links, via
-`payload_m` + `m: 0`). We reproduce that mechanism directly with hnswlib,
-the same graph algorithm Qdrant's segments use internally, so we can
-measure the effect in isolation, without a live cluster's network/disk noise
-in the way.
-
-  "shared"    = one HNSW graph over every tenant's vectors, tenant matched
-                with hnswlib's `filter` callback at query time. This stands
-                in for a multi-tenant collection *without* is_tenant, or
-                without any partitioning at all: tenant is just another
-                payload field, and the graph doesn't know about it.
-  "dedicated" = tenant gets its own graph containing only its own vectors.
-                This stands in for `is_tenant=true` (tenant-restricted HNSW
-                links) and for collection-per-tenant / a dedicated shard:
-                structurally, all three give a tenant its own graph.
-
-Vectors are real OpenAI ada-002 embeddings (dbpedia-entities-openai-1M, see
-mtp/real_data.py): real semantic clustering, not a synthetic Gaussian
-mixture. Tenant assignment is independent of that clustering (a tenant is a
-business/access boundary, not a topic), so filtering by tenant in the shared
-graph is a genuine low-selectivity needle-in-a-haystack search, not an easy
-case where the tenant's vectors happen to already sit together.
+Uses real embeddings with content-independent tenant assignment. Shared
+queries use a Python filter callback; dedicated queries do not. Timings
+therefore include callback overhead and are not Qdrant performance results.
+This does not benchmark is_tenant storage locality or Qdrant's planner.
 """
 
 import time

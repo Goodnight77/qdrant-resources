@@ -7,73 +7,99 @@ blended together. 1.19 lets you scope that computation to a payload filter
 (`search_params.idf.corpus`), typically the same tenant filter you're already
 applying to the results.
 
-Two measurements, in order of how much you should trust them:
+Two controlled demonstrations use generated two-term queries and binary
+relevance defined by rare-term presence. AG News supplies real documents;
+the synthetic corpus illustrates the mechanism with constructed vocabulary.
+Neither estimates typical production search quality. Document vectors use
+raw term counts, without BM25 saturation or document-length normalization.
 
-  `run_real_ag_news` / `run_real_category_sweep`: real AG News articles
-  (mtp/real_text_data.py), 4 real categories as tenants. Word pairs are
-  *discovered* from real term-frequency stats, not constructed, and every
-  (common, rare) pair found is measured and averaged in, including the
-  ones where global and per-tenant IDF come out identical. This is the
-  honest, unfiltered picture: the distortion is real but modest on average,
-  and concentrated in specific categories/word pairs rather than uniform.
-
-  `run_synthetic_worst_case`: a constructed vocabulary (mtp/text_data.py)
-  tuned so the failure mode is unmistakable (repeated tenant-common jargon,
-  no genuinely rare term in the document). This is *not* a claim about how
-  bad the effect is in practice. It exists to make the mechanism legible:
-  here is what global IDF does at its worst, and why.
-
-Runs against qdrant-client's embedded local mode by default (no server
-needed, this is real Qdrant scoring code, just not a real network/disk
-path). Point QDRANT_URL / QDRANT_API_KEY at a real deployment to reproduce
-against a live server instead; the query and indexing code is unchanged
-either way.
+The default backend is qdrant-client's Python local implementation. Set
+QDRANT_URL / QDRANT_API_KEY to compare against a Qdrant server. Each case
+creates a uniquely named temporary collection and removes it when finished.
 """
 
 import os
+from contextlib import closing, contextmanager
+from datetime import datetime, timezone
+from importlib.metadata import version
+from uuid import uuid4
 
 import numpy as np
 from qdrant_client import QdrantClient, models
 
 from mtp import config
 from mtp.real_text_data import CATEGORIES, discover_word_pairs, load_ag_news_sample
+from mtp.real_text_data import tokens_to_bm25
 from mtp.real_text_data import tokens_to_sparse as real_tokens_to_sparse
 from mtp.text_data import build_vocab_and_tenants, generate_tenant_docs, tokens_to_sparse
-
-COLLECTION = "mtp_per_tenant_idf"
 
 
 def _make_client():
     url = os.environ.get("QDRANT_URL")
     if url:
-        return QdrantClient(url=url, api_key=os.environ.get("QDRANT_API_KEY"), timeout=60)
+        return QdrantClient(url=url, api_key=os.environ.get("QDRANT_API_KEY") or None, timeout=60)
     return QdrantClient(":memory:")
 
 
-def _ndcg_at_k(ranked_relevant, k):
-    """ranked_relevant: list of 0/1 in ranked order."""
+def _backend_metadata():
+    metadata = {
+        "mode": "server" if os.environ.get("QDRANT_URL") else "local_memory",
+        "qdrant_client_version": version("qdrant-client"),
+        "started_at_utc": datetime.now(timezone.utc).isoformat(),
+    }
+    if metadata["mode"] == "server":
+        with closing(_make_client()) as client:
+            metadata["server"] = client.info().model_dump()
+    return metadata
+
+
+@contextmanager
+def _experiment_collection():
+    client = _make_client()
+    collection = f"mtp_per_tenant_idf_{uuid4().hex}"
+    created = False
+    try:
+        client.create_collection(
+            collection,
+            vectors_config={},
+            sparse_vectors_config={"bm25": models.SparseVectorParams(modifier=models.Modifier.IDF)},
+        )
+        created = True
+        client.create_payload_index(
+            collection,
+            field_name="tenant",
+            field_schema=models.KeywordIndexParams(type=models.KeywordIndexType.KEYWORD, is_tenant=True),
+        )
+        yield client, collection
+    finally:
+        try:
+            if created:
+                client.delete_collection(collection)
+        finally:
+            client.close()
+
+
+def _ndcg_at_k(ranked_relevant, k, n_relevant):
+    """Binary NDCG normalized by all relevant documents in the tenant corpus."""
     dcg = sum(rel / np.log2(i + 2) for i, rel in enumerate(ranked_relevant[:k]))
-    ideal = sorted(ranked_relevant, reverse=True)
-    idcg = sum(rel / np.log2(i + 2) for i, rel in enumerate(ideal[:k]))
+    idcg = sum(1 / np.log2(i + 2) for i in range(min(k, n_relevant)))
     return dcg / idcg if idcg > 0 else 0.0
 
 
-def _setup_collection(client, tenants, n_common, n_domain_common, n_domain_rare, docs_per_tenant, seed):
+def _relevant_count(client, collection, tenant, word, field):
+    return client.count(
+        collection,
+        count_filter=models.Filter(must=[
+            models.FieldCondition(key="tenant", match=models.MatchValue(value=tenant)),
+            models.FieldCondition(key=field, match=models.MatchValue(value=word)),
+        ]),
+        exact=True,
+    ).count
+
+
+def _setup_collection(client, collection, tenants, n_common, n_domain_common, n_domain_rare, docs_per_tenant, seed):
     word_to_id, common_words, tenant_vocab = build_vocab_and_tenants(
         tenants, n_common, n_domain_common, n_domain_rare, seed
-    )
-
-    if client.collection_exists(COLLECTION):
-        client.delete_collection(COLLECTION)
-    client.create_collection(
-        COLLECTION,
-        vectors_config={},
-        sparse_vectors_config={"bm25": models.SparseVectorParams(modifier=models.Modifier.IDF)},
-    )
-    client.create_payload_index(
-        COLLECTION,
-        field_name="tenant",
-        field_schema=models.KeywordIndexParams(type=models.KeywordIndexType.KEYWORD, is_tenant=True),
     )
 
     all_docs = []
@@ -104,12 +130,12 @@ def _setup_collection(client, tenants, n_common, n_domain_common, n_domain_rare,
             point_id += 1
 
     for i in range(0, len(points), 500):
-        client.upsert(COLLECTION, points=points[i:i + 500])
+        client.upsert(collection, points=points[i:i + 500])
 
     return word_to_id, tenant_vocab, all_docs
 
 
-def _run_trials(client, word_to_id, tenant_vocab, tenants, n_trials, k, seed):
+def _run_trials(client, collection, word_to_id, tenant_vocab, tenants, n_trials, k, seed):
     rng = np.random.default_rng(seed)
     global_scores, scoped_scores = [], []
     per_tenant = {t: {"global": [], "scoped": []} for t in tenants}
@@ -127,10 +153,10 @@ def _run_trials(client, word_to_id, tenant_vocab, tenants, n_trials, k, seed):
             return 1 if w_rare in (hit.payload or {}).get("rare_hits", []) else 0
 
         global_hits = client.query_points(
-            COLLECTION, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
+            collection, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
         ).points
         scoped_hits = client.query_points(
-            COLLECTION,
+            collection,
             query=query_vec,
             using="bm25",
             query_filter=tenant_filter,
@@ -139,8 +165,9 @@ def _run_trials(client, word_to_id, tenant_vocab, tenants, n_trials, k, seed):
             with_payload=True,
         ).points
 
-        g = _ndcg_at_k([relevance(h) for h in global_hits], k)
-        s = _ndcg_at_k([relevance(h) for h in scoped_hits], k)
+        n_relevant = _relevant_count(client, collection, tenant, w_rare, "rare_hits")
+        g = _ndcg_at_k([relevance(h) for h in global_hits], k, n_relevant)
+        s = _ndcg_at_k([relevance(h) for h in scoped_hits], k, n_relevant)
         global_scores.append(g)
         scoped_scores.append(s)
         per_tenant[tenant]["global"].append(g)
@@ -153,39 +180,39 @@ def run_synthetic_flagship():
     """3 named industries, constructed vocabulary tuned to make the failure
     mode unmistakable. See the module docstring for why this isn't the
     headline number."""
-    client = _make_client()
-    word_to_id, tenant_vocab, _ = _setup_collection(
-        client,
-        config.E3_TENANTS,
-        config.E3_N_COMMON_WORDS,
-        config.E3_N_DOMAIN_COMMON,
-        config.E3_N_DOMAIN_RARE,
-        config.E3_DOCS_PER_TENANT,
-        config.SEED,
-    )
-    global_scores, scoped_scores, per_tenant = _run_trials(
-        client, word_to_id, tenant_vocab, config.E3_TENANTS, config.E3_TRIALS, config.E3_K, config.SEED + 1
-    )
-    result = {
-        "n_tenants": len(config.E3_TENANTS),
-        "docs_per_tenant": config.E3_DOCS_PER_TENANT,
-        "global_ndcg_mean": float(np.mean(global_scores)),
-        "global_ndcg_std": float(np.std(global_scores)),
-        "scoped_ndcg_mean": float(np.mean(scoped_scores)),
-        "scoped_ndcg_std": float(np.std(scoped_scores)),
-        "per_tenant": {
-            t: {
-                "global_ndcg_mean": float(np.mean(v["global"])),
-                "scoped_ndcg_mean": float(np.mean(v["scoped"])),
-            }
-            for t, v in per_tenant.items()
-        },
-    }
-    print(
-        f"synthetic worst case (3 tenants): global NDCG@10={result['global_ndcg_mean']:.3f} "
-        f"vs per-tenant NDCG@10={result['scoped_ndcg_mean']:.3f}"
-    )
-    return result
+    with _experiment_collection() as (client, collection):
+        word_to_id, tenant_vocab, _ = _setup_collection(
+            client, collection,
+            config.E3_TENANTS,
+            config.E3_N_COMMON_WORDS,
+            config.E3_N_DOMAIN_COMMON,
+            config.E3_N_DOMAIN_RARE,
+            config.E3_DOCS_PER_TENANT,
+            config.SEED,
+        )
+        global_scores, scoped_scores, per_tenant = _run_trials(
+            client, collection, word_to_id, tenant_vocab, config.E3_TENANTS, config.E3_TRIALS, config.E3_K, config.SEED + 1
+        )
+        result = {
+            "n_tenants": len(config.E3_TENANTS),
+            "docs_per_tenant": config.E3_DOCS_PER_TENANT,
+            "global_ndcg_mean": float(np.mean(global_scores)),
+            "global_ndcg_std": float(np.std(global_scores)),
+            "scoped_ndcg_mean": float(np.mean(scoped_scores)),
+            "scoped_ndcg_std": float(np.std(scoped_scores)),
+            "per_tenant": {
+                t: {
+                    "global_ndcg_mean": float(np.mean(v["global"])),
+                    "scoped_ndcg_mean": float(np.mean(v["scoped"])),
+                }
+                for t, v in per_tenant.items()
+            },
+        }
+        print(
+            f"synthetic worst case (3 tenants): global NDCG@10={result['global_ndcg_mean']:.3f} "
+            f"vs per-tenant NDCG@10={result['scoped_ndcg_mean']:.3f}"
+        )
+        return result
 
 
 def run_synthetic_tenant_count_sweep(tenant_counts, trials_per_point):
@@ -195,44 +222,36 @@ def run_synthetic_tenant_count_sweep(tenant_counts, trials_per_point):
     rows = []
     for t_count in tenant_counts:
         tenants = [f"tenant_{i}" for i in range(t_count)]
-        client = _make_client()
-        word_to_id, tenant_vocab, _ = _setup_collection(
-            client,
-            tenants,
-            config.E3_N_COMMON_WORDS,
-            config.E3_N_DOMAIN_COMMON,
-            config.E3_N_DOMAIN_RARE,
-            config.E3_DOCS_PER_TENANT,
-            config.SEED + 100 + t_count,
-        )
-        global_scores, scoped_scores, _ = _run_trials(
-            client, word_to_id, tenant_vocab, tenants, trials_per_point, config.E3_K, config.SEED + 200 + t_count
-        )
-        rows.append({
-            "n_tenants": t_count,
-            "global_ndcg_mean": float(np.mean(global_scores)),
-            "scoped_ndcg_mean": float(np.mean(scoped_scores)),
-        })
-        print(f"n_tenants={t_count:>3}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
+        with _experiment_collection() as (client, collection):
+            word_to_id, tenant_vocab, _ = _setup_collection(
+                client, collection,
+                tenants,
+                config.E3_N_COMMON_WORDS,
+                config.E3_N_DOMAIN_COMMON,
+                config.E3_N_DOMAIN_RARE,
+                config.E3_DOCS_PER_TENANT,
+                config.SEED + 100 + t_count,
+            )
+            global_scores, scoped_scores, _ = _run_trials(
+                client, collection, word_to_id, tenant_vocab, tenants, trials_per_point, config.E3_K, config.SEED + 200 + t_count
+            )
+            rows.append({
+                "n_tenants": t_count,
+                "global_ndcg_mean": float(np.mean(global_scores)),
+                "scoped_ndcg_mean": float(np.mean(scoped_scores)),
+            })
+            print(f"n_tenants={t_count:>3}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
     return rows
 
 
-def _index_real_sample(client, sample, word_to_id):
-    if client.collection_exists(COLLECTION):
-        client.delete_collection(COLLECTION)
-    client.create_collection(
-        COLLECTION,
-        vectors_config={},
-        sparse_vectors_config={"bm25": models.SparseVectorParams(modifier=models.Modifier.IDF)},
-    )
-    client.create_payload_index(
-        COLLECTION,
-        field_name="tenant",
-        field_schema=models.KeywordIndexParams(type=models.KeywordIndexType.KEYWORD, is_tenant=True),
-    )
+def _index_real_sample(client, collection, sample, word_to_id, bm25_params=None):
     points = []
     for i, (category, tokens) in enumerate(zip(sample["category"], sample["tokens"])):
-        sparse = real_tokens_to_sparse(tokens, word_to_id)
+        sparse = (
+            real_tokens_to_sparse(tokens, word_to_id)
+            if bm25_params is None
+            else tokens_to_bm25(tokens, word_to_id, **bm25_params)
+        )
         if not sparse:
             continue
         points.append(
@@ -243,11 +262,11 @@ def _index_real_sample(client, sample, word_to_id):
             )
         )
     for i in range(0, len(points), 500):
-        client.upsert(COLLECTION, points=points[i:i + 500])
+        client.upsert(collection, points=points[i:i + 500])
     return len(points)
 
 
-def _measure_real_pairs(client, categories, pairs, word_to_id, k):
+def _measure_real_pairs(client, collection, categories, pairs, word_to_id, k):
     """Exhaustive, deterministic: every discovered (common, rare) pair per
     category gets exactly one query each way. No resampling: the documents
     and their term frequencies are real and fixed, so there's no randomness
@@ -264,10 +283,10 @@ def _measure_real_pairs(client, categories, pairs, word_to_id, k):
             for w_rare in rare_words:
                 query_vec = models.SparseVector(indices=[word_to_id[w_common], word_to_id[w_rare]], values=[1.0, 1.0])
                 global_hits = client.query_points(
-                    COLLECTION, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
+                    collection, query=query_vec, using="bm25", query_filter=tenant_filter, limit=k, with_payload=True
                 ).points
                 scoped_hits = client.query_points(
-                    COLLECTION,
+                    collection,
                     query=query_vec,
                     using="bm25",
                     query_filter=tenant_filter,
@@ -279,8 +298,9 @@ def _measure_real_pairs(client, categories, pairs, word_to_id, k):
                 def relevance(hit, w_rare=w_rare):
                     return 1 if w_rare in (hit.payload or {}).get("tokens_present", []) else 0
 
-                gs.append(_ndcg_at_k([relevance(h) for h in global_hits], k))
-                ss.append(_ndcg_at_k([relevance(h) for h in scoped_hits], k))
+                n_relevant = _relevant_count(client, collection, category, w_rare, "tokens_present")
+                gs.append(_ndcg_at_k([relevance(h) for h in global_hits], k, n_relevant))
+                ss.append(_ndcg_at_k([relevance(h) for h in scoped_hits], k, n_relevant))
         if gs:
             per_category[category] = {
                 "n_pairs": len(gs),
@@ -295,30 +315,30 @@ def _measure_real_pairs(client, categories, pairs, word_to_id, k):
 def run_real_ag_news():
     """4 real AG News categories (world/sports/business/sci-tech) as tenants.
     Every discovered (domain-common, domain-rare) word pair is measured and
-    averaged in: this is the actual, unfiltered effect size on real text."""
-    client = _make_client()
-    sample = load_ag_news_sample(config.E3_AG_NEWS_DOCS_PER_CATEGORY, config.SEED)
-    pairs = discover_word_pairs(sample, CATEGORIES, top_k=config.E3_AG_NEWS_TOP_K)
-    vocab = set()
-    for toks in sample["tokens"]:
-        vocab.update(toks)
-    word_to_id = {w: i for i, w in enumerate(sorted(vocab))}
-    n_indexed = _index_real_sample(client, sample, word_to_id)
+    averaged in under the generated-query, rare-term relevance protocol."""
+    with _experiment_collection() as (client, collection):
+        sample = load_ag_news_sample(config.E3_AG_NEWS_DOCS_PER_CATEGORY, config.SEED)
+        pairs = discover_word_pairs(sample, CATEGORIES, top_k=config.E3_AG_NEWS_TOP_K)
+        vocab = set()
+        for toks in sample["tokens"]:
+            vocab.update(toks)
+        word_to_id = {w: i for i, w in enumerate(sorted(vocab))}
+        n_indexed = _index_real_sample(client, collection, sample, word_to_id)
 
-    per_category, all_global, all_scoped = _measure_real_pairs(client, CATEGORIES, pairs, word_to_id, config.E3_K)
-    result = {
-        "n_docs_indexed": n_indexed,
-        "n_pairs_measured": len(all_global),
-        "global_ndcg_mean": float(np.mean(all_global)),
-        "scoped_ndcg_mean": float(np.mean(all_scoped)),
-        "per_category": per_category,
-        "discovered_pairs": pairs,
-    }
-    print(
-        f"real AG News ({len(CATEGORIES)} categories, {len(all_global)} word pairs): "
-        f"global NDCG@10={result['global_ndcg_mean']:.3f} vs per-tenant NDCG@10={result['scoped_ndcg_mean']:.3f}"
-    )
-    return result
+        per_category, all_global, all_scoped = _measure_real_pairs(client, collection, CATEGORIES, pairs, word_to_id, config.E3_K)
+        result = {
+            "n_docs_indexed": n_indexed,
+            "n_pairs_measured": len(all_global),
+            "global_ndcg_mean": float(np.mean(all_global)),
+            "scoped_ndcg_mean": float(np.mean(all_scoped)),
+            "per_category": per_category,
+            "discovered_pairs": pairs,
+        }
+        print(
+            f"real AG News ({len(CATEGORIES)} categories, {len(all_global)} word pairs): "
+            f"global NDCG@10={result['global_ndcg_mean']:.3f} vs per-tenant NDCG@10={result['scoped_ndcg_mean']:.3f}"
+        )
+        return result
 
 
 def run_real_category_sweep():
@@ -335,27 +355,31 @@ def run_real_category_sweep():
     rows = []
     for t_count in range(2, len(CATEGORIES) + 1):
         categories = CATEGORIES[:t_count]
-        client = _make_client()
-        subset = sample[sample["category"].isin(categories)]
-        _index_real_sample(client, subset, word_to_id)
-        pairs = discover_word_pairs(subset, categories, top_k=config.E3_AG_NEWS_TOP_K)
-        _, all_global, all_scoped = _measure_real_pairs(client, categories, pairs, word_to_id, config.E3_K)
-        rows.append({
-            "n_tenants": t_count,
-            "n_pairs_measured": len(all_global),
-            "global_ndcg_mean": float(np.mean(all_global)) if all_global else None,
-            "scoped_ndcg_mean": float(np.mean(all_scoped)) if all_scoped else None,
-        })
-        print(f"real categories={t_count}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
+        with _experiment_collection() as (client, collection):
+            subset = sample[sample["category"].isin(categories)]
+            _index_real_sample(client, collection, subset, word_to_id)
+            pairs = discover_word_pairs(subset, categories, top_k=config.E3_AG_NEWS_TOP_K)
+            _, all_global, all_scoped = _measure_real_pairs(client, collection, categories, pairs, word_to_id, config.E3_K)
+            rows.append({
+                "n_tenants": t_count,
+                "n_pairs_measured": len(all_global),
+                "global_ndcg_mean": float(np.mean(all_global)) if all_global else None,
+                "scoped_ndcg_mean": float(np.mean(all_scoped)) if all_scoped else None,
+            })
+            print(f"real categories={t_count}  global NDCG@10={rows[-1]['global_ndcg_mean']:.3f}  per-tenant NDCG@10={rows[-1]['scoped_ndcg_mean']:.3f}")
     return rows
 
 
 def run():
+    backend = _backend_metadata()
     real_flagship = run_real_ag_news()
     real_sweep = run_real_category_sweep()
     synthetic_flagship = run_synthetic_flagship()
     synthetic_sweep = run_synthetic_tenant_count_sweep(config.E3_SWEEP_TENANT_COUNTS, trials_per_point=config.E3_SWEEP_TRIALS)
     return {
+        "backend": backend,
+        "metric": "binary_ndcg_at_k_corpus_relevance",
+        "k": config.E3_K,
         "real_flagship": real_flagship,
         "real_category_sweep": real_sweep,
         "synthetic_flagship": synthetic_flagship,
@@ -364,7 +388,13 @@ def run():
 
 
 if __name__ == "__main__":
+    import argparse
     import json
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, default=Path(config.results_path("exp3_per_tenant_idf.json")))
+    args = parser.parse_args()
     result = run()
-    with open(config.results_path("exp3_per_tenant_idf.json"), "w") as f:
-        json.dump(result, f, indent=2)
+    with args.output.open("w") as f:
+        json.dump(result, f, indent=2, allow_nan=False)

@@ -13,86 +13,109 @@ def _load(name):
 
 
 def chart_exp1_latency():
-    data = _load("exp1_graph_isolation.json")
+    data = _load("exp1_qdrant_graph_isolation.json")
+    if not data["complete"]:
+        raise ValueError("Finish the Qdrant experiment 1 run before rendering its charts")
     rows = data["rows"]
     x = [r["n_tenants"] for r in rows]
-    shared = [r["shared_latency_ms"] for r in rows]
-    dedicated = [r["dedicated_latency_ms"] for r in rows]
-
     apply_style()
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    ax.plot(x, shared, marker="o", color=SHARED_COLOR, linewidth=2, label="one shared graph + tenant filter")
-    ax.plot(x, dedicated, marker="o", color=DEDICATED_COLOR, linewidth=2, label="dedicated per-tenant graph")
-    ax.set_xscale("log")
-    ax.set_yscale("log")
-    vectors_label = f"{data['n_total']:,} vectors total" if "n_total" in data else "real embeddings"
-    ax.set_xlabel(f"tenants sharing the collection ({vectors_label})")
-    ax.set_ylabel("mean query latency (ms, log scale)")
-    ax.set_title("Payload partitioning vs. dedicated tenant graphs")
-    style_axes(ax)
-    ax.legend(loc="upper left")
-    last = rows[-1]
-    ax.annotate(
-        f"{last['shared_latency_ms']/last['dedicated_latency_ms']:.0f}x slower\nat {last['selectivity_pct']:.2f}% selectivity",
-        xy=(x[-1], shared[-1]), xytext=(-150, -60), textcoords="offset points",
-        fontsize=9, color=INK_MUTED, ha="center",
-    )
-    fig.tight_layout()
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5))
+    for ax, scope, title in zip(axes, ["server", "client"],
+                               ["Server-reported processing", "Client-observed REST round trip"]):
+        for layout, color, label in [("shared", SHARED_COLOR, "indexed shared"),
+                                     ("tenant", DEDICATED_COLOR, "tenant-optimized")]:
+            for statistic, linestyle, marker in [("median", "-", "o"), ("p95", "--", "^")]:
+                values = [r["summary"][layout][f"{scope}_{statistic}_ms"] for r in rows]
+                ax.plot(x, values, color=color, linestyle=linestyle, marker=marker,
+                        label=f"{label}: {statistic}")
+        ax.set_xscale("log")
+        ax.set_xticks(x)
+        ax.set_xticklabels([f"{r['n_tenants']}{'' if r['quality_comparable'] else '*'}" for r in rows])
+        ax.set_xlabel("tenants sharing the collection")
+        ax.set_ylabel("query latency (ms)")
+        if scope == "server":
+            ax.set_yscale("log")
+            ax.set_ylabel("query latency (ms, log scale)")
+        else:
+            ax.set_ylim(bottom=0)
+        ax.set_title(title)
+        ax.legend(fontsize=8)
+        style_axes(ax)
+    server_version = data["environment"]["server"]["version"]
+    fig.suptitle(f"Qdrant {server_version}: {data['n_total']:,} vectors, {data['repeats']} warm query passes")
+    if any(not r["quality_comparable"] for r in rows):
+        fig.text(0.5, 0.01, "* Recall target missed: latency is not an equal-quality speed comparison.",
+                 ha="center", fontsize=9)
+        fig.tight_layout(rect=(0, 0.06, 1, 1))
+    else:
+        fig.tight_layout()
     fig.savefig(config.asset_path("exp1_latency.png"), dpi=160)
     plt.close(fig)
 
 
 def chart_exp1_recall():
-    data = _load("exp1_graph_isolation.json")
+    data = _load("exp1_qdrant_graph_isolation.json")
+    if not data["complete"]:
+        raise ValueError("Finish the Qdrant experiment 1 run before rendering its charts")
     rows = data["rows"]
-    x = [r["n_tenants"] for r in rows]
-    shared = [r["shared_recall_at_10"] for r in rows]
-    dedicated = [r["dedicated_recall_at_10"] for r in rows]
-
     apply_style()
     fig, ax = plt.subplots(figsize=(7, 4.5))
-    width = 0.35
-    idx = np.arange(len(x))
-    ax.bar(idx - width / 2, shared, width, color=SHARED_COLOR, label="shared graph + filter")
-    ax.bar(idx + width / 2, dedicated, width, color=DEDICATED_COLOR, label="dedicated graph")
+    idx = np.arange(len(rows))
+    for offset, layout, color, label in [(-0.18, "shared", SHARED_COLOR, "indexed shared"),
+                                        (0.18, "tenant", DEDICATED_COLOR, "tenant-optimized")]:
+        values = [r["summary"][layout]["recall_at_10"] for r in rows]
+        ax.bar(idx + offset, values, width=0.36, color=color, label=label)
+    ax.axhline(data["recall_target"], color=INK_MUTED, linestyle="--", linewidth=1,
+               label=f"validation target: {data['recall_target']:.2f}")
     ax.set_xticks(idx)
-    ax.set_xticklabels([str(v) for v in x])
+    ax.set_xticklabels([str(r["n_tenants"]) for r in rows])
     ax.set_ylim(0, 1.08)
     ax.set_xlabel("tenants sharing the collection")
-    ax.set_ylabel("recall@10")
-    ax.set_title("Recall holds either way: the cost is latency, not accuracy")
+    ax.set_ylabel("recall@10 on evaluation queries")
+    ax.set_title("Qdrant recall vs. exact cosine ground truth")
     style_axes(ax)
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower left")
     fig.tight_layout()
-    fig.savefig(config.asset_path("exp1_recall.png"), dpi=160)
+    fig.savefig(config.asset_path("exp1_recall.png"), dpi=120)
     plt.close(fig)
 
 
 def chart_exp2_tiered():
-    data = _load("exp2_tiered.json")
-    minnow = data["minnow_summary"]
-    whale = data["whale_summary"]
-
+    data = _load("exp2_qdrant_tiered.json")
+    if not data["complete"]:
+        raise ValueError("Finish the Qdrant experiment 2 run before rendering its chart")
     apply_style()
-    fig, axes = plt.subplots(1, 2, figsize=(9, 4.5))
-
-    for ax, group, title in [(axes[0], minnow, "small tenants (long tail)"), (axes[1], whale, "the whale tenant")]:
-        vals = [group["naive_latency_ms"], group["tiered_latency_ms"]]
-        colors = [SHARED_COLOR, DEDICATED_COLOR]
-        bars = ax.bar(["naive\n(one shared graph)", "tiered\n(dedicated + fallback)"], vals, color=colors, width=0.55)
-        for b, v in zip(bars, vals):
-            ax.annotate(f"{v:.2f} ms", xy=(b.get_x() + b.get_width() / 2, v), xytext=(0, 4),
-                        textcoords="offset points", ha="center", fontsize=10, color="#0b0b0b")
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.7))
+    groups = [data["groups"][key] for key in ["minnows", "whale"]]
+    positions = np.arange(2)
+    for ax, scope, title in zip(axes, ["server", "client"],
+                               ["Server-reported processing", "Client-observed REST round trip"]):
+        for offset, layout, color, label in [(-0.19, "shared", SHARED_COLOR, "one shared shard"),
+                                           (0.19, "tiered", DEDICATED_COLOR, "dedicated + fallback")]:
+            medians = [g["summary"][layout][f"{scope}_median_ms"] for g in groups]
+            p95s = [g["summary"][layout][f"{scope}_p95_ms"] for g in groups]
+            bars = ax.bar(positions + offset, medians, width=0.34, color=color, label=label)
+            ax.vlines(positions + offset, medians, p95s, color=color, linewidth=2)
+            ax.scatter(positions + offset, p95s, marker="_", s=150, color=color)
+            for bar, value in zip(bars, medians):
+                ax.annotate(f"{value:.3f}" if scope == "server" else f"{value:.2f}",
+                            (bar.get_x() + bar.get_width()/2, value), (0, 4),
+                            textcoords="offset points", ha="center", fontsize=9)
+        ax.set_xticks(positions)
+        ax.set_xticklabels(["small tenants", "whale tenant"])
+        ax.set_ylabel("query latency (ms)")
+        ax.set_ylim(0, max(g["summary"][layout][f"{scope}_p95_ms"]
+                           for g in groups for layout in ["shared", "tiered"]) * 1.32)
         ax.set_title(title)
-        ax.set_ylabel("mean query latency (ms)")
+        ax.legend(fontsize=8, loc="upper left")
         style_axes(ax)
-
-    fig.suptitle(
-        f"Whale is {data['whale_share_pct']:.0f}% of the collection: tiering is a big win for the long tail",
-        fontsize=11, y=1.03,
-    )
-    fig.tight_layout()
-    fig.savefig(config.asset_path("exp2_tiered_latency.png"), dpi=160, bbox_inches="tight")
+    fig.suptitle(f"Qdrant {data['environment']['server']['version']}: shared vs. tiered shards on one node")
+    footnote = "Bars: median; whisker caps: p95 (not confidence intervals). Three warm query passes."
+    if any(not group["quality_comparable"] for group in groups):
+        footnote += " Recall target missed; see result JSON."
+    fig.text(0.5, 0.01, footnote, ha="center", fontsize=9)
+    fig.tight_layout(rect=(0, 0.05, 1, 1))
+    fig.savefig(config.asset_path("exp2_tiered_latency.png"), dpi=160)
     plt.close(fig)
 
 
@@ -134,7 +157,7 @@ def chart_exp3_real_sweep():
     ax.set_xticks(x)
     ax.set_xlabel("real AG News categories sharing the collection")
     ax.set_ylabel("mean NDCG@10")
-    ax.set_title("Real data: the IDF gap doesn't need scale to show up")
+    ax.set_title("AG News scenarios: categories and query pairs vary")
     style_axes(ax)
     ax.legend(loc="lower left")
     fig.tight_layout()
@@ -166,6 +189,34 @@ def chart_exp3_synthetic_worst_case():
     plt.close(fig)
 
 
+def chart_exp3_bm25_comparison():
+    data = _load("exp3_bm25_comparison.json")["variants"]
+    categories = list(data["raw_tf"]["per_category"])
+    labels = ["sci-tech" if c == "scitech" else c for c in categories] + ["overall"]
+    apply_style()
+    fig, axes = plt.subplots(1, 2, figsize=(11, 4.5), sharey=True)
+    x = np.arange(len(labels))
+    for ax, mode, title in zip(axes, ["global", "scoped"], ["Global IDF", "Per-tenant IDF"]):
+        field = f"{mode}_ndcg_mean"
+        for offset, variant, color, label in [
+            (-0.18, "raw_tf", SHARED_COLOR, "raw counts"),
+            (0.18, "bm25", DEDICATED_COLOR, "BM25 weights"),
+        ]:
+            values = [data[variant]["per_category"][c][field] for c in categories] + [data[variant][field]]
+            ax.bar(x + offset, values, width=0.36, color=color, label=label)
+        ax.set_xticks(x)
+        ax.set_xticklabels(labels, rotation=20)
+        ax.set_ylim(0, 1.05)
+        ax.set_title(title)
+        ax.legend(loc="lower left")
+        style_axes(ax)
+    axes[0].set_ylabel("NDCG@10")
+    fig.suptitle("Same AG News documents and queries: raw counts vs. BM25 weights")
+    fig.tight_layout()
+    fig.savefig(config.asset_path("exp3_bm25_comparison.png"), dpi=160)
+    plt.close(fig)
+
+
 def make_all():
     chart_exp1_latency()
     chart_exp1_recall()
@@ -173,6 +224,7 @@ def make_all():
     chart_exp3_real_flagship()
     chart_exp3_real_sweep()
     chart_exp3_synthetic_worst_case()
+    chart_exp3_bm25_comparison()
     print("charts written to", config.ASSETS_DIR)
 
 

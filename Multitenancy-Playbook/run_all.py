@@ -1,37 +1,29 @@
-"""Run every experiment and regenerate every chart.
+"""Run all experiments and regenerate charts.
 
-Experiments 1 and 2 (mtp.sim.graph_isolation, mtp.sim.tiered) are pure
-hnswlib simulations: no Qdrant server involved, nothing to start first.
-
-Experiment 3 (mtp.sim.per_tenant_idf) runs real Qdrant sparse-vector/IDF
-code. By default it uses qdrant-client's embedded local mode (no server
-needed). Set QDRANT_URL (and QDRANT_API_KEY, if needed) before running this
-to reproduce it against a real deployment instead, e.g. `docker compose up
--d` for a local server, or point at Qdrant Cloud.
+Experiments 1-2 require a Qdrant server (localhost:6333 by default).
+Experiment 2 also requires cluster mode for custom shards. Experiment 3 uses local memory
+unless QDRANT_URL is set; set it to the Docker endpoint to use the server.
 """
 
 import json
+from pathlib import Path
 
-from mtp import config
-from mtp.sim import graph_isolation, per_tenant_idf, tiered
+from mtp import config, qdrant_graph_isolation, qdrant_tiered
+from mtp.sim import bm25_comparison, per_tenant_idf
 from mtp.viz import charts
 
 
 def main():
     print("=" * 70)
-    print("Experiment 1: payload partitioning vs. dedicated (is_tenant) graphs")
+    print("Experiment 1: Qdrant indexed shared vs. tenant-optimized search")
     print("=" * 70)
-    r1 = graph_isolation.run()
-    with open(config.results_path("exp1_graph_isolation.json"), "w") as f:
-        json.dump(r1, f, indent=2)
+    qdrant_graph_isolation.run(Path(config.results_path("exp1_qdrant_graph_isolation.json")))
 
     print()
     print("=" * 70)
     print("Experiment 2: tiered multitenancy (whale + long tail)")
     print("=" * 70)
-    r2 = tiered.run()
-    with open(config.results_path("exp2_tiered.json"), "w") as f:
-        json.dump(r2, f, indent=2)
+    qdrant_tiered.run(Path(config.results_path("exp2_qdrant_tiered.json")))
 
     print()
     print("=" * 70)
@@ -40,6 +32,11 @@ def main():
     r3 = per_tenant_idf.run()
     with open(config.results_path("exp3_per_tenant_idf.json"), "w") as f:
         json.dump(r3, f, indent=2)
+
+    print("Experiment 3 extension: raw-count vs. BM25 document weights")
+    comparison = bm25_comparison.run()
+    with open(config.results_path("exp3_bm25_comparison.json"), "w") as f:
+        json.dump(comparison, f, indent=2, allow_nan=False)
 
     print()
     print("rendering charts ...")

@@ -1,0 +1,364 @@
+{
+  "compared_at_utc": "2026-10-03T14:07:40.845607+00:00",
+  "docker_image": "qdrant/qdrant:v1.19.1",
+  "docker_image_digest": "qdrant/qdrant@sha256:12364fe851b9f17356fc88189fc06d1b521262e04659ec7345975b00c9246a10",
+  "server": {
+    "title": "qdrant - vector search engine",
+    "version": "1.19.1",
+    "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+  },
+  "qdrant_client_version": "1.19.0",
+  "files": [
+    {
+      "local": "exp3_bm25_comparison.json",
+      "docker": "exp3_bm25_comparison_docker.json",
+      "all_baseline_fields_match_exactly": true
+    },
+    {
+      "local": "exp3_per_tenant_idf.json",
+      "docker": "exp3_per_tenant_idf_docker.json",
+      "all_baseline_fields_match_exactly": true
+    }
+  ],
+  "ndcg_metrics_compared": 56,
+  "max_absolute_ndcg_delta": 0.0,
+  "ndcg_comparisons": [
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.global_ndcg_mean",
+      "local": 0.7059511661919602,
+      "docker": 0.7059511661919602,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.scoped_ndcg_mean",
+      "local": 0.7258055721868357,
+      "docker": 0.7258055721868357,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.world.global_ndcg_mean",
+      "local": 0.860211522875081,
+      "docker": 0.860211522875081,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.world.scoped_ndcg_mean",
+      "local": 0.860211522875081,
+      "docker": 0.860211522875081,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.sports.global_ndcg_mean",
+      "local": 0.7579022453249473,
+      "docker": 0.7579022453249473,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.sports.scoped_ndcg_mean",
+      "local": 0.7579022453249473,
+      "docker": 0.7579022453249473,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.business.global_ndcg_mean",
+      "local": 0.6178213962715553,
+      "docker": 0.6178213962715553,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.business.scoped_ndcg_mean",
+      "local": 0.6906208849194326,
+      "docker": 0.6906208849194326,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.scitech.global_ndcg_mean",
+      "local": 0.528828667348405,
+      "docker": 0.528828667348405,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.raw_tf.per_category.scitech.scoped_ndcg_mean",
+      "local": 0.528828667348405,
+      "docker": 0.528828667348405,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.global_ndcg_mean",
+      "local": 0.9077952223728357,
+      "docker": 0.9077952223728357,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.scoped_ndcg_mean",
+      "local": 0.9517713771757379,
+      "docker": 0.9517713771757379,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.world.global_ndcg_mean",
+      "local": 0.9587312094876119,
+      "docker": 0.9587312094876119,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.world.scoped_ndcg_mean",
+      "local": 0.9859876880456295,
+      "docker": 0.9859876880456295,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.sports.global_ndcg_mean",
+      "local": 0.9062165652910179,
+      "docker": 0.9062165652910179,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.sports.scoped_ndcg_mean",
+      "local": 0.9712645914476712,
+      "docker": 0.9712645914476712,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.business.global_ndcg_mean",
+      "local": 0.9528702122045828,
+      "docker": 0.9528702122045828,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.business.scoped_ndcg_mean",
+      "local": 0.9864531031948766,
+      "docker": 0.9864531031948766,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.scitech.global_ndcg_mean",
+      "local": 0.7661467425757772,
+      "docker": 0.7661467425757772,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_bm25_comparison.variants.bm25.per_category.scitech.scoped_ndcg_mean",
+      "local": 0.8191845004342926,
+      "docker": 0.8191845004342926,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.global_ndcg_mean",
+      "local": 0.7059511661919602,
+      "docker": 0.7059511661919602,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.scoped_ndcg_mean",
+      "local": 0.7258055721868357,
+      "docker": 0.7258055721868357,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.world.global_ndcg_mean",
+      "local": 0.860211522875081,
+      "docker": 0.860211522875081,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.world.scoped_ndcg_mean",
+      "local": 0.860211522875081,
+      "docker": 0.860211522875081,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.sports.global_ndcg_mean",
+      "local": 0.7579022453249473,
+      "docker": 0.7579022453249473,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.sports.scoped_ndcg_mean",
+      "local": 0.7579022453249473,
+      "docker": 0.7579022453249473,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.business.global_ndcg_mean",
+      "local": 0.6178213962715553,
+      "docker": 0.6178213962715553,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.business.scoped_ndcg_mean",
+      "local": 0.6906208849194326,
+      "docker": 0.6906208849194326,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.scitech.global_ndcg_mean",
+      "local": 0.528828667348405,
+      "docker": 0.528828667348405,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_flagship.per_category.scitech.scoped_ndcg_mean",
+      "local": 0.528828667348405,
+      "docker": 0.528828667348405,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[0].global_ndcg_mean",
+      "local": 0.7957013655848463,
+      "docker": 0.7957013655848463,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[0].scoped_ndcg_mean",
+      "local": 0.8514043456833768,
+      "docker": 0.8514043456833768,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[1].global_ndcg_mean",
+      "local": 0.7790432014527185,
+      "docker": 0.7790432014527185,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[1].scoped_ndcg_mean",
+      "local": 0.8299345350698757,
+      "docker": 0.8299345350698757,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[2].global_ndcg_mean",
+      "local": 0.7059511661919602,
+      "docker": 0.7059511661919602,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.real_category_sweep[2].scoped_ndcg_mean",
+      "local": 0.7258055721868357,
+      "docker": 0.7258055721868357,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.global_ndcg_mean",
+      "local": 0.7690193951221537,
+      "docker": 0.7690193951221537,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.global_ndcg_std",
+      "local": 0.3743667015041006,
+      "docker": 0.3743667015041006,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.scoped_ndcg_std",
+      "local": 0.0,
+      "docker": 0.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.fintech.global_ndcg_mean",
+      "local": 0.6995813172981658,
+      "docker": 0.6995813172981658,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.fintech.scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.healthcare.global_ndcg_mean",
+      "local": 0.801915163078366,
+      "docker": 0.801915163078366,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.healthcare.scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.gaming.global_ndcg_mean",
+      "local": 0.8077543618754609,
+      "docker": 0.8077543618754609,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_flagship.per_tenant.gaming.scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[0].global_ndcg_mean",
+      "local": 0.7985241747853113,
+      "docker": 0.7985241747853113,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[0].scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[1].global_ndcg_mean",
+      "local": 0.7686059994283341,
+      "docker": 0.7686059994283341,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[1].scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[2].global_ndcg_mean",
+      "local": 0.6785510804481576,
+      "docker": 0.6785510804481576,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[2].scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[3].global_ndcg_mean",
+      "local": 0.6312585048118573,
+      "docker": 0.6312585048118573,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[3].scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[4].global_ndcg_mean",
+      "local": 0.7572572469039568,
+      "docker": 0.7572572469039568,
+      "delta": 0.0
+    },
+    {
+      "metric": "exp3_per_tenant_idf.synthetic_tenant_count_sweep[4].scoped_ndcg_mean",
+      "local": 1.0,
+      "docker": 1.0,
+      "delta": 0.0
+    }
+  ],
+  "scope": "Experiment 3 ranking quality only; no server latency or concurrency measurement."
+}

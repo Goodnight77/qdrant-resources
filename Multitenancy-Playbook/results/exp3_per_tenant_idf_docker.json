@@ -1,4 +1,14 @@
 {
+  "backend": {
+    "mode": "server",
+    "qdrant_client_version": "1.19.0",
+    "started_at_utc": "2026-10-03T14:04:46.681850+00:00",
+    "server": {
+      "title": "qdrant - vector search engine",
+      "version": "1.19.1",
+      "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+    }
+  },
   "metric": "binary_ndcg_at_k_corpus_relevance",
   "k": 10,
   "real_flagship": {

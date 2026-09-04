@@ -1,4 +1,4 @@
-"""Experiment 2: tiered multitenancy for a whale + long-tail distribution.
+"""Archived experiment 2 hnswlib illustration; use mtp.qdrant_tiered for server measurements.
 
 Real multi-tenant apps are rarely made of equal-sized tenants: a handful of
 big accounts hold most of the data, and a long tail of small tenants share
@@ -7,7 +7,7 @@ tenants their own dedicated shard and letting small tenants share a
 "fallback" shard together, instead of everyone (whale included) sharing
 one collection-wide index.
 
-We reproduce the two shapes with hnswlib graphs, same as experiment 1:
+This historical simulation reproduces two shapes with hnswlib graphs:
 
   "naive"  = one shared HNSW graph across the whale and every minnow tenant,
              each queried via a tenant filter. This is what you get if you
@@ -16,9 +16,9 @@ We reproduce the two shapes with hnswlib graphs, same as experiment 1:
              second graph sized to just their own data (the "fallback
              shard"), decoupled from the whale entirely.
 
-The story here isn't about is_tenant's per-tenant HNSW links (experiment 1
-already covers that). It's specifically about what happens to the *small*
-tenants when a single disproportionately large tenant shares their graph.
+This illustrates graph layouts, not is_tenant storage locality or native
+Qdrant filtering. Python filter costs are included. Sequential queries do
+not measure resource contention or isolation under concurrent tenant load.
 
 Same real embedding pool as experiment 1 (dbpedia-entities-openai-1M), just
 re-split whale/minnow instead of into even tenants.

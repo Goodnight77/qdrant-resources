@@ -94,8 +94,8 @@ def discover_word_pairs(
                 common.append((tok, frac_here))
             if rare_frac_range[0] <= frac_here <= rare_frac_range[1]:
                 rare.append((tok, frac_here))
-        common.sort(key=lambda x: -x[1])
-        rare.sort(key=lambda x: -x[1])
+        common.sort(key=lambda x: (-x[1], x[0]))
+        rare.sort(key=lambda x: (-x[1], x[0]))
         result[category] = {
             "domain_common": [w for w, _ in common[:top_k]],
             "domain_rare": [w for w, _ in rare[:top_k]],
@@ -110,3 +110,16 @@ def tokens_to_sparse(tokens, word_to_id):
             wid = word_to_id[tok]
             counts[wid] = counts.get(wid, 0) + 1
     return counts
+
+
+def tokens_to_bm25(tokens, word_to_id, avg_len, k1=1.2, b=0.75):
+    """BM25 document weights; Qdrant applies IDF at query time.
+
+    Keep the baseline tokenizer and vocabulary so only weighting changes.
+    avg_len is measured once over the indexed corpus, shared by both IDF modes.
+    """
+    if avg_len <= 0 or k1 <= 0 or not 0 <= b <= 1:
+        raise ValueError("BM25 requires avg_len > 0, k1 > 0, and 0 <= b <= 1")
+    counts = tokens_to_sparse(tokens, word_to_id)
+    norm = k1 * (1 - b + b * len(tokens) / avg_len)
+    return {wid: count * (k1 + 1) / (count + norm) for wid, count in counts.items()}

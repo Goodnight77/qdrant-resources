@@ -1,0 +1,156 @@
+{
+  "metric": "binary_ndcg_at_k_corpus_relevance",
+  "k": 10,
+  "seed": 42,
+  "corpus_sha256": "201d9b3d98c1a4e998f1f4d5a7dafb53a882f3c235ddd2c65f7e12b22a9351b8",
+  "bm25_params": {
+    "avg_len": 31.0635,
+    "k1": 1.2,
+    "b": 0.75
+  },
+  "avg_len_scope": "all indexed documents, fixed for both IDF modes",
+  "discovered_pairs": {
+    "world": {
+      "domain_common": [
+        "minister",
+        "killed",
+        "prime",
+        "iraqi",
+        "leader",
+        "military"
+      ],
+      "domain_rare": [
+        "israel",
+        "hostage",
+        "gaza",
+        "north",
+        "region",
+        "leaders"
+      ]
+    },
+    "sports": {
+      "domain_common": [
+        "league",
+        "cup",
+        "coach",
+        "sports",
+        "points",
+        "olympic"
+      ],
+      "domain_rare": [
+        "title",
+        "champions",
+        "medal",
+        "boston",
+        "match",
+        "straight"
+      ]
+    },
+    "business": {
+      "domain_common": [
+        "prices",
+        "stocks",
+        "profit",
+        "shares",
+        "growth",
+        "investor"
+      ],
+      "domain_rare": [
+        "biggest",
+        "fell",
+        "crude",
+        "street",
+        "cut",
+        "interest"
+      ]
+    },
+    "scitech": {
+      "domain_common": [
+        "space",
+        "music",
+        "users",
+        "search"
+      ],
+      "domain_rare": [
+        "digital",
+        "nasa",
+        "version",
+        "linux",
+        "systems",
+        "source"
+      ]
+    }
+  },
+  "variants": {
+    "raw_tf": {
+      "n_docs_indexed": 12000,
+      "n_pairs_measured": 132,
+      "global_ndcg_mean": 0.7059511661919602,
+      "scoped_ndcg_mean": 0.7258055721868357,
+      "per_category": {
+        "world": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.860211522875081,
+          "scoped_ndcg_mean": 0.860211522875081
+        },
+        "sports": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.7579022453249473,
+          "scoped_ndcg_mean": 0.7579022453249473
+        },
+        "business": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.6178213962715553,
+          "scoped_ndcg_mean": 0.6906208849194326
+        },
+        "scitech": {
+          "n_pairs": 24,
+          "global_ndcg_mean": 0.528828667348405,
+          "scoped_ndcg_mean": 0.528828667348405
+        }
+      }
+    },
+    "bm25": {
+      "n_docs_indexed": 12000,
+      "n_pairs_measured": 132,
+      "global_ndcg_mean": 0.9077952223728357,
+      "scoped_ndcg_mean": 0.9517713771757379,
+      "per_category": {
+        "world": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.9587312094876119,
+          "scoped_ndcg_mean": 0.9859876880456295
+        },
+        "sports": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.9062165652910179,
+          "scoped_ndcg_mean": 0.9712645914476712
+        },
+        "business": {
+          "n_pairs": 36,
+          "global_ndcg_mean": 0.9528702122045828,
+          "scoped_ndcg_mean": 0.9864531031948766
+        },
+        "scitech": {
+          "n_pairs": 24,
+          "global_ndcg_mean": 0.7661467425757772,
+          "scoped_ndcg_mean": 0.8191845004342926
+        }
+      }
+    }
+  },
+  "paired_changes": {
+    "global": {
+      "mean_delta": 0.20184405618087561,
+      "improved": 96,
+      "unchanged": 27,
+      "worsened": 9
+    },
+    "scoped": {
+      "mean_delta": 0.22596580498890223,
+      "improved": 98,
+      "unchanged": 33,
+      "worsened": 1
+    }
+  }
+}

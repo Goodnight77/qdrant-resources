@@ -1,8 +1,7 @@
 """Shared HNSW/tenant-assignment helpers for the dense-vector experiments (1 and
 2). The vectors themselves are real embeddings (see mtp/real_data.py); tenant
-assignment here is independent of their content, exactly like a real SaaS
-app, where "which customer does this belong to" has nothing to do with what
-the embedding is about. That's what makes tenant filtering on an unpartitioned
+assignment here is independent of their content by design; real applications may correlate tenant ownership and
+content. That's what makes tenant filtering on an unpartitioned
 index a genuinely hard case: the matching vectors are scattered evenly across
 the whole graph, not sitting in one neighborhood.
 """

@@ -1,7 +1,7 @@
 """Shared knobs for the multitenancy experiments.
 
-Everything here is sized to run on a laptop in a few minutes total. Bump
-DIM/N/T up if you want production-scale numbers (see the README).
+The experiments are sized for a laptop. The server benchmark rebuilds indexes
+across the tenant sweep and can take tens of minutes (see the README).
 """
 
 import os
@@ -22,10 +22,10 @@ def asset_path(name):
 
 SEED = 42
 
-# ---- Experiment 1: payload partitioning vs. dedicated (is_tenant) graphs ----
+# ---- Experiment 1: indexed shared vs. tenant-optimized search ----
 # Real OpenAI ada-002 embeddings (1536-d), dbpedia-entities-openai-1M; see mtp/real_data.py.
 E1_DIM = 1536
-E1_N_QUERY_POOL = 2000   # held-out real documents, reused (cycled) across the sweep below
+E1_N_QUERY_POOL = 2000   # held-out real documents, reused across the tenant-count sweep
 E1_TENANT_COUNTS = [5, 20, 100, 500, 3000]  # selectivity = 1 / tenant_count
 E1_SAMPLE_TENANTS = 25  # tenants actually queried per tenant_count (full sweep is redundant)
 E1_QUERIES_PER_TENANT = 20
@@ -65,3 +65,7 @@ E3_TRIALS = 200                # query trials to average over (flagship, 3 tenan
 E3_SWEEP_TRIALS = 80           # query trials per point in the tenant-count sweep
 E3_SWEEP_TENANT_COUNTS = [2, 3, 6, 10, 20]
 E3_K = 10
+
+# Fixed before evaluating the BM25 comparison; no tuning on evaluation queries.
+E3_BM25_K1 = 1.2
+E3_BM25_B = 0.75
