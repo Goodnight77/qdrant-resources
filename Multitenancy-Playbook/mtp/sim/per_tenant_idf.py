@@ -189,8 +189,8 @@ def run_synthetic_flagship():
 
 
 def run_synthetic_tenant_count_sweep(tenant_counts, trials_per_point):
-    """More tenants sharing a collection -> more 'other' volume diluting global
-    stats -> the distortion should get worse. Uses generic tenant_0..tenant_{T-1}
+    """Measure how the global-versus-per-tenant IDF gap changes with tenant count.
+    Uses generic tenant_0..tenant_{T-1}
     instead of the three named industries, so it scales to any T."""
     rows = []
     for t_count in tenant_counts:

@@ -109,7 +109,7 @@ def chart_exp3_real_flagship():
     ax.bar(idx - width / 2, global_scores, width, color=SHARED_COLOR, label="global IDF (default)")
     ax.bar(idx + width / 2, scoped_scores, width, color=DEDICATED_COLOR, label="per-tenant IDF (idf.corpus)")
     ax.set_xticks(idx)
-    ax.set_xticklabels(categories)
+    ax.set_xticklabels(["sci-tech" if c == "scitech" else c for c in categories])
     ax.set_ylim(0, 1.08)
     ax.set_ylabel("NDCG@10")
     ax.set_title("Real AG News: per-tenant IDF vs. global IDF, by category")
