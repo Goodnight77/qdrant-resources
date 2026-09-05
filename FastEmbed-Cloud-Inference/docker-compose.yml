@@ -1,0 +1,42 @@
+# Pattern B: Qdrant + a local embedding sidecar (Text Embeddings Inference),
+# both reachable only over the internal "backend" network. Neither
+# container has a route out to a third-party embedding API, and the app
+# never needs an embedding provider API key.
+#
+# Usage:
+#   docker compose up -d
+#   curl http://localhost:6333/collections            # Qdrant
+#   curl -X POST http://localhost:8080/embed \
+#        -H 'Content-Type: application/json' \
+#        -d '{"inputs": "Qdrant is a vector database."}'  # TEI sidecar
+
+services:
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333"   # HTTP API
+      - "6334:6334"   # gRPC API
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - backend
+
+  embedder:
+    image: ghcr.io/huggingface/text-embeddings-inference:cpu-latest
+    command: ["--model-id", "BAAI/bge-small-en-v1.5"]
+    ports:
+      - "8080:80"     # exposed here only for local testing/curl above;
+                       # in a real deployment, drop this and let only
+                       # services on `backend` reach it.
+    volumes:
+      - tei_cache:/data   # persist model weights across restarts
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  qdrant_storage:
+  tei_cache:
