@@ -1,0 +1,14 @@
+services:
+  qdrant:
+    image: qdrant/qdrant:v1.19.1
+    command: ["./qdrant", "--uri", "http://qdrant:6335"]
+    environment:
+      QDRANT__CLUSTER__ENABLED: "true"  # custom shards for experiment 2
+    ports:
+      - "127.0.0.1:6333:6333"   # REST
+      - "127.0.0.1:6334:6334"   # gRPC
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  qdrant_data:

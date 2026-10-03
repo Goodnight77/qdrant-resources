@@ -1,0 +1,183 @@
+{
+  "backend": {
+    "mode": "server",
+    "qdrant_client_version": "1.19.0",
+    "started_at_utc": "2026-10-03T14:04:46.681850+00:00",
+    "server": {
+      "title": "qdrant - vector search engine",
+      "version": "1.19.1",
+      "commit": "6ab21cac18ebb6f4ae29102c7f8f5cc11affd5de"
+    }
+  },
+  "metric": "binary_ndcg_at_k_corpus_relevance",
+  "k": 10,
+  "real_flagship": {
+    "n_docs_indexed": 12000,
+    "n_pairs_measured": 132,
+    "global_ndcg_mean": 0.7059511661919602,
+    "scoped_ndcg_mean": 0.7258055721868357,
+    "per_category": {
+      "world": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.860211522875081,
+        "scoped_ndcg_mean": 0.860211522875081
+      },
+      "sports": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.7579022453249473,
+        "scoped_ndcg_mean": 0.7579022453249473
+      },
+      "business": {
+        "n_pairs": 36,
+        "global_ndcg_mean": 0.6178213962715553,
+        "scoped_ndcg_mean": 0.6906208849194326
+      },
+      "scitech": {
+        "n_pairs": 24,
+        "global_ndcg_mean": 0.528828667348405,
+        "scoped_ndcg_mean": 0.528828667348405
+      }
+    },
+    "discovered_pairs": {
+      "world": {
+        "domain_common": [
+          "minister",
+          "killed",
+          "prime",
+          "iraqi",
+          "leader",
+          "military"
+        ],
+        "domain_rare": [
+          "israel",
+          "hostage",
+          "gaza",
+          "north",
+          "region",
+          "leaders"
+        ]
+      },
+      "sports": {
+        "domain_common": [
+          "league",
+          "cup",
+          "coach",
+          "sports",
+          "points",
+          "olympic"
+        ],
+        "domain_rare": [
+          "title",
+          "champions",
+          "medal",
+          "boston",
+          "match",
+          "straight"
+        ]
+      },
+      "business": {
+        "domain_common": [
+          "prices",
+          "stocks",
+          "profit",
+          "shares",
+          "growth",
+          "investor"
+        ],
+        "domain_rare": [
+          "biggest",
+          "fell",
+          "crude",
+          "street",
+          "cut",
+          "interest"
+        ]
+      },
+      "scitech": {
+        "domain_common": [
+          "space",
+          "music",
+          "users",
+          "search"
+        ],
+        "domain_rare": [
+          "digital",
+          "nasa",
+          "version",
+          "linux",
+          "systems",
+          "source"
+        ]
+      }
+    }
+  },
+  "real_category_sweep": [
+    {
+      "n_tenants": 2,
+      "n_pairs_measured": 72,
+      "global_ndcg_mean": 0.7957013655848463,
+      "scoped_ndcg_mean": 0.8514043456833768
+    },
+    {
+      "n_tenants": 3,
+      "n_pairs_measured": 108,
+      "global_ndcg_mean": 0.7790432014527185,
+      "scoped_ndcg_mean": 0.8299345350698757
+    },
+    {
+      "n_tenants": 4,
+      "n_pairs_measured": 132,
+      "global_ndcg_mean": 0.7059511661919602,
+      "scoped_ndcg_mean": 0.7258055721868357
+    }
+  ],
+  "synthetic_flagship": {
+    "n_tenants": 3,
+    "docs_per_tenant": 500,
+    "global_ndcg_mean": 0.7690193951221537,
+    "global_ndcg_std": 0.3743667015041006,
+    "scoped_ndcg_mean": 1.0,
+    "scoped_ndcg_std": 0.0,
+    "per_tenant": {
+      "fintech": {
+        "global_ndcg_mean": 0.6995813172981658,
+        "scoped_ndcg_mean": 1.0
+      },
+      "healthcare": {
+        "global_ndcg_mean": 0.801915163078366,
+        "scoped_ndcg_mean": 1.0
+      },
+      "gaming": {
+        "global_ndcg_mean": 0.8077543618754609,
+        "scoped_ndcg_mean": 1.0
+      }
+    }
+  },
+  "synthetic_tenant_count_sweep": [
+    {
+      "n_tenants": 2,
+      "global_ndcg_mean": 0.7985241747853113,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 3,
+      "global_ndcg_mean": 0.7686059994283341,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 6,
+      "global_ndcg_mean": 0.6785510804481576,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 10,
+      "global_ndcg_mean": 0.6312585048118573,
+      "scoped_ndcg_mean": 1.0
+    },
+    {
+      "n_tenants": 20,
+      "global_ndcg_mean": 0.7572572469039568,
+      "scoped_ndcg_mean": 1.0
+    }
+  ]
+}

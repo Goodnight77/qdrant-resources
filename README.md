@@ -53,7 +53,8 @@ New to Qdrant? Here's how to get started:
 5. **Vector Compression?** Read about [Google TurboQuant](TurboQuant/) - **✅ Ready!**
 6. **Quantization tradeoffs?** Compare them in the [Quantization Face-Off](Quantization-FaceOff/) - **✅ Ready!**
 7. **Exploring Qdrant 1.19?** Run the [Qdrant 1.19 hands-on demos](Qdrant-1.19-hands-on/) - **✅ Ready!**
-8. **Embedding without external API calls?** See [FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/) - **✅ Ready!**
+8. **Multi-tenant collections?** Read the [Multitenancy Playbook](Multitenancy-Playbook/) - **✅ Ready!**
+9. **Embedding without external API calls?** See [FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/) - **✅ Ready!**
 
 <hr>
 
@@ -94,6 +95,7 @@ New to Qdrant? Here's how to get started:
 | ✅ | **[Quantization Face-Off](Quantization-FaceOff/)** | Head-to-head benchmark of Qdrant quantization (f32 / SQ / PQ / BQ) on 1M-scale text embeddings | Recall vs latency vs RAM, rescoring sweeps, cost analysis, W&B telemetry |
 | ✅ | **[Chonkie Integration](chonkie/)** | Text chunking with seamless Qdrant integration | Multiple chunking strategies, performance comparison |
 | ✅ | **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** | Runnable examples for the Qdrant 1.19 release | Turbo4, memory tiers, prefix filters, parallel scrolling |
+| ✅ | **[Multitenancy Playbook](Multitenancy-Playbook/)** | Shared tenant indexing, tiered shards, and per-tenant IDF in Qdrant 1.19 | Docker benchmarks of latency and recall, BM25/IDF ranking comparisons, decision framework |
 | ✅ | **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** | CPU/GPU/Qdrant Cloud embedding benchmarks on real data, no external API calls | Real-data indexing throughput, query latency, retrieval quality (hit-rate@10, MRR@10) across three deployment patterns |
 | 🚧 | **Image Recommendations** | Image similarity search systems (in development) | Computer vision, embeddings, similarity search |
 | 🚧 | **Agent Workflows** | AI agent implementations (planned) | LangGraph, agentic RAG, vector memory |

@@ -1,0 +1,61 @@
+{
+  "n_total": 74924,
+  "shared_build_s": 22.089048385620117,
+  "rows": [
+    {
+      "n_tenants": 5,
+      "selectivity_pct": 20.0,
+      "shared_recall_at_10": 1.0,
+      "shared_latency_ms": 4.682421684265137,
+      "shared_latency_p95_ms": 5.883944034576416,
+      "dedicated_recall_at_10": 1.0,
+      "dedicated_latency_ms": 1.0061097145080566,
+      "dedicated_latency_p95_ms": 1.1896014213562012,
+      "dedicated_build_ms_per_tenant": 3085.6133460998535
+    },
+    {
+      "n_tenants": 20,
+      "selectivity_pct": 5.0,
+      "shared_recall_at_10": 1.0,
+      "shared_latency_ms": 12.11357831954956,
+      "shared_latency_p95_ms": 16.285681724548336,
+      "dedicated_recall_at_10": 0.99925,
+      "dedicated_latency_ms": 0.6647562980651855,
+      "dedicated_latency_p95_ms": 0.8517026901245113,
+      "dedicated_build_ms_per_tenant": 575.7765650749207
+    },
+    {
+      "n_tenants": 100,
+      "selectivity_pct": 1.0,
+      "shared_recall_at_10": 1.0,
+      "shared_latency_ms": 37.838191986083984,
+      "shared_latency_p95_ms": 47.816669940948486,
+      "dedicated_recall_at_10": 1.0,
+      "dedicated_latency_ms": 0.3710665702819824,
+      "dedicated_latency_p95_ms": 0.4891991615295409,
+      "dedicated_build_ms_per_tenant": 97.09843635559082
+    },
+    {
+      "n_tenants": 500,
+      "selectivity_pct": 0.2,
+      "shared_recall_at_10": 1.0,
+      "shared_latency_ms": 104.54906463623047,
+      "shared_latency_p95_ms": 121.56350612640381,
+      "dedicated_recall_at_10": 1.0,
+      "dedicated_latency_ms": 0.14998817443847656,
+      "dedicated_latency_p95_ms": 0.19437074661254877,
+      "dedicated_build_ms_per_tenant": 4.680290222167969
+    },
+    {
+      "n_tenants": 3000,
+      "selectivity_pct": 0.03333333333333333,
+      "shared_recall_at_10": 1.0,
+      "shared_latency_ms": 122.11372661590576,
+      "shared_latency_p95_ms": 131.0890793800354,
+      "dedicated_recall_at_10": 1.0,
+      "dedicated_latency_ms": 0.0561833381652832,
+      "dedicated_latency_p95_ms": 0.09088516235351558,
+      "dedicated_build_ms_per_tenant": 1.2905597686767578
+    }
+  ]
+}
