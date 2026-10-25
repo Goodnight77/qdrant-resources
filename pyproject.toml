@@ -1,0 +1,15 @@
+# Shared lint/format settings for all Python projects in this repo.
+# Not a package: each project keeps its own requirements.txt / pyproject.toml.
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+# `lambda l: ...` is used for hnswlib filter callbacks.
+ignore = ["E741"]
+
+[tool.black]
+line-length = 88
