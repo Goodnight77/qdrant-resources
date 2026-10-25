@@ -3,7 +3,7 @@ module bm25-go-hybrid-demo
 go 1.25.0
 
 require (
-	github.com/harsh04/bm25 v1.3.2
+	github.com/harsh04/bm25 v1.5.1
 	github.com/qdrant/go-client v1.18.2
 )
 
