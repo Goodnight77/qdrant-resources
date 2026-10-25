@@ -62,3 +62,26 @@ jobs:
       - name: No Python changes
         if: steps.changed_py.outputs.any_changed != 'true'
         run: echo "No Python files changed."
+
+  go:
+    name: Go vet and build (bm25-go-hybrid)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: bm25-go-hybrid
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: bm25-go-hybrid/go.mod
+          cache-dependency-path: bm25-go-hybrid/go.sum
+
+      - name: Go vet
+        run: go vet ./...
+
+      - name: Go build
+        run: go build ./...

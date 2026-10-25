@@ -55,6 +55,8 @@ New to Qdrant? Here's how to get started:
 7. **Exploring Qdrant 1.19?** Run the [Qdrant 1.19 hands-on demos](Qdrant-1.19-hands-on/) - **✅ Ready!**
 8. **Multi-tenant collections?** Read the [Multitenancy Playbook](Multitenancy-Playbook/) - **✅ Ready!**
 9. **Embedding without external API calls?** See [FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/) - **✅ Ready!**
+10. **Filtered search at low selectivity?** Benchmark [ACORN vs filtered HNSW](ACORN-HNSW/) - **✅ Ready!**
+11. **Hybrid search in Go?** Try [bm25-go-hybrid](bm25-go-hybrid/) - **✅ Ready!**
 
 <hr>
 
@@ -97,6 +99,7 @@ New to Qdrant? Here's how to get started:
 | ✅ | **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** | Runnable examples for the Qdrant 1.19 release | Turbo4, memory tiers, prefix filters, parallel scrolling |
 | ✅ | **[Multitenancy Playbook](Multitenancy-Playbook/)** | Shared tenant indexing, tiered shards, and per-tenant IDF in Qdrant 1.19 | Docker benchmarks of latency and recall, BM25/IDF ranking comparisons, decision framework |
 | ✅ | **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** | CPU/GPU/Qdrant Cloud embedding benchmarks on real data, no external API calls | Real-data indexing throughput, query latency, retrieval quality (hit-rate@10, MRR@10) across three deployment patterns |
+| ✅ | **[ACORN vs Filtered HNSW](ACORN-HNSW/)** | Benchmark of Qdrant 1.16's ACORN search against vanilla filtered HNSW across filter selectivity from 0.1% to 90% | Recall@10 and latency vs selectivity, `hnsw_ef` sweep, charts from raw results |
 | 🚧 | **Image Recommendations** | Image similarity search systems (in development) | Computer vision, embeddings, similarity search |
 | 🚧 | **Agent Workflows** | AI agent implementations (planned) | LangGraph, agentic RAG, vector memory |
 
