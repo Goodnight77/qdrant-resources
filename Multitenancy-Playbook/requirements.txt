@@ -1,6 +1,6 @@
 qdrant-client>=1.19.0
 hnswlib>=0.8.0
-numpy>=1.26
+numpy>=2.5.4
 matplotlib>=3.8
 huggingface_hub>=0.25
 pandas>=2.0
