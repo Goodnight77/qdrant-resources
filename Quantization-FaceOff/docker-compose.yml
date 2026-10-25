@@ -2,7 +2,7 @@
 # Pinned to latest stable as of build; >=1.18 required for TurboQuant.
 services:
   qdrant:
-    image: qdrant/qdrant:v1.18.2
+    image: qdrant/qdrant:v1.20.0
     container_name: qfo-qdrant
     ports:
       - "6333:6333"   # REST
