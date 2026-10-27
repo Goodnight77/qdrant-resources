@@ -1,6 +1,6 @@
 services:
   qdrant:
-    image: qdrant/qdrant:v1.19.1
+    image: qdrant/qdrant:v1.20.0
     command: ["./qdrant", "--uri", "http://qdrant:6335"]
     environment:
       QDRANT__CLUSTER__ENABLED: "true"  # custom shards for experiment 2
