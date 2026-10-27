@@ -78,6 +78,7 @@ New to Qdrant? Here's how to get started:
 - **[Matryoshka MRL](Matryoshka-MRL/)** - Matryoshka Representation Learning (MRL) concepts
 - **[TurboQuant](TurboQuant/)** - High-recall vector quantization and memory-efficient search
 - **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** - Runnable demos for Turbo4, memory tiers, prefix matching, and parallel scrolling
+- **[Qdrant 1.20 Hands-On](Qdrant-1.20-hands-on/)** - Runnable demos for BM25 on full-text indexes, the code tokenizer, per-element nested indexes, and turbo16/turbo8
 - **[Haystack + Qdrant](haystack-qdrant/)** - Qdrant Cloud integration with semantic retrieval and metadata filtering
 - **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** - Embedding models alongside Qdrant with no external API calls: FastEmbed, a local sidecar, and Qdrant Cloud's built-in inference, benchmarked on real data
 
@@ -97,6 +98,7 @@ New to Qdrant? Here's how to get started:
 | ✅ | **[Quantization Face-Off](Quantization-FaceOff/)** | Head-to-head benchmark of Qdrant quantization (f32 / SQ / PQ / BQ) on 1M-scale text embeddings | Recall vs latency vs RAM, rescoring sweeps, cost analysis, W&B telemetry |
 | ✅ | **[Chonkie Integration](chonkie/)** | Text chunking with seamless Qdrant integration | Multiple chunking strategies, performance comparison |
 | ✅ | **[Qdrant 1.19 Hands-On](Qdrant-1.19-hands-on/)** | Runnable examples for the Qdrant 1.19 release | Turbo4, memory tiers, prefix filters, parallel scrolling |
+| ✅ | **[Qdrant 1.20 Hands-On](Qdrant-1.20-hands-on/)** | Runnable examples for the Qdrant 1.20 release | BM25 without sparse vectors, code tokenizer, per-element indexes, turbo16/turbo8 |
 | ✅ | **[Multitenancy Playbook](Multitenancy-Playbook/)** | Shared tenant indexing, tiered shards, and per-tenant IDF in Qdrant 1.19 | Docker benchmarks of latency and recall, BM25/IDF ranking comparisons, decision framework |
 | ✅ | **[FastEmbed Cloud Inference](FastEmbed-Cloud-Inference/)** | CPU/GPU/Qdrant Cloud embedding benchmarks on real data, no external API calls | Real-data indexing throughput, query latency, retrieval quality (hit-rate@10, MRR@10) across three deployment patterns |
 | ✅ | **[ACORN vs Filtered HNSW](ACORN-HNSW/)** | Benchmark of Qdrant 1.16's ACORN search against vanilla filtered HNSW across filter selectivity from 0.1% to 90% | Recall@10 and latency vs selectivity, `hnsw_ef` sweep, charts from raw results |

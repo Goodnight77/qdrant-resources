@@ -29,3 +29,5 @@ A collection of articles covering Qdrant vector database, RAG systems, and integ
 13. [A Foundational Guide to Neural Search and Relevance Feedback](https://mohamedarbi.xyz/posts/foundational-guide-neural-search-relevance-feedback)
 14. [Qdrant 1.19: Turbo4 Datatype & Memory Tiers](https://mohamedarbi.xyz/posts/qdrant-119)
     ↳ Try it: [Qdrant-1.19-hands-on/](Qdrant-1.19-hands-on/)
+15. [Qdrant 1.20: BM25 Without Sparse Vectors, Turbo16 & Turbo8](https://mohamedarbi.xyz/posts/qdrant-120)
+    ↳ Try it: [Qdrant-1.20-hands-on/](Qdrant-1.20-hands-on/)
