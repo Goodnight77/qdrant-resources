@@ -1,4 +1,4 @@
-qdrant-client[fastembed]>=1.9.0
+qdrant-client[fastembed]>=1.20.0
 
 # Only needed for benchmark_real_data.py (loads BeIR/nfcorpus from Hugging Face)
 datasets
