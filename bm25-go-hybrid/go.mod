@@ -4,7 +4,7 @@ go 1.25.0
 
 require (
 	github.com/harsh04/bm25 v1.3.2
-	github.com/qdrant/go-client v1.20.0
+	github.com/qdrant/go-client v1.20.1
 )
 
 require (
